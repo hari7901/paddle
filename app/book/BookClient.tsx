@@ -15,16 +15,12 @@ import {
   Mail,
 } from "lucide-react";
 
-/* ------------------------------------------------------------------ */
-/*  Everything below is identical to your previous Book page.         */
-/*  The only change is that it now lives in a true client component.  */
-/* ------------------------------------------------------------------ */
-
 export default function BookClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
+  const [bookingReference, setBookingReference] = useState("");
 
   // Booking details from query string
   const date = searchParams.get("date") || "";
@@ -63,7 +59,7 @@ export default function BookClient() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (
@@ -79,11 +75,45 @@ export default function BookClient() {
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+
+    try {
+      // API call to create booking
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          courtId,
+          courtName,
+          courtType,
+          price,
+          date,
+          slotId,
+          time,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          paymentMethod: formData.paymentMethod,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to create booking");
+      }
+
+      setBookingReference(result.data._id);
       setBookingComplete(true);
-      // TODO: replace with real API call
-    }, 1500);
+    } catch (error) {
+      console.error("Booking error:", error);
+      window.alert(
+        "Failed to complete booking. The slot may no longer be available."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   /* redirect if params missing */
@@ -91,10 +121,10 @@ export default function BookClient() {
     if (!date || !courtId || !time) router.push("/");
   }, [date, courtId, time, router]);
 
-  /* ---------------- render (same UI as before) ---------------- */
+  /* ---------------- render ---------------- */
   if (bookingComplete) {
     return (
-      <div className="min-h-screen bg-black text-white pt-24 pb-16">
+      <div className="min-h-screen bg-black text-white pt-35 pb-16">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto bg-gray-900 rounded-lg p-8 border-2 border-green-800">
             {/* confirmation */}
@@ -106,6 +136,11 @@ export default function BookClient() {
               <p className="text-gray-300">
                 Your court has been successfully booked.
               </p>
+              {bookingReference && (
+                <p className="text-sm text-gray-400 mt-2">
+                  Booking Reference: {bookingReference}
+                </p>
+              )}
             </div>
 
             {/* summary */}
@@ -171,7 +206,7 @@ export default function BookClient() {
 
   /* booking form */
   return (
-    <div className="min-h-screen bg-black text-white pt-24 pb-16">
+    <div className="min-h-screen bg-black text-white pt-35 pb-16">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto">
           <Link

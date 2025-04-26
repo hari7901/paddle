@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Calendar, Clock, ArrowLeft } from "lucide-react";
+import { Clock, ArrowLeft } from "lucide-react";
 
 /* ---------- types ---------- */
 type TimeSlot = { id: string; time: string; available: boolean };
@@ -24,50 +24,69 @@ export default function BookSlotsClient() {
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  /* --- 1. read courtId from URL --------------------------------- */
+  /* --- 1. Fetch court data from API ------------------------------ */
   useEffect(() => {
     const courtId = searchParams.get("courtId") || "";
-
-    setSelectedDate(new Date().toISOString().split("T")[0]); // today
-
-    // demo data – replace with API in production
-    if (courtId === "court-1")
-      setSelectedCourt({
-        id: "court-1",
-        name: "Singles Court",
-        type: "Singles",
-        price: 1200,
-        image: "/paddle3.jpg",
-      });
-    else if (courtId === "court-2")
-      setSelectedCourt({
-        id: "court-2",
-        name: "Doubles Court",
-        type: "Doubles",
-        price: 1600,
-        image: "/paddle4.jpg",
-      });
-
-    setLoading(false);
-  }, [searchParams]);
-
-  /* --- 2. generate demo time-slots ------------------------------ */
-  useEffect(() => {
-    if (!selectedDate) return;
-
-    const slots: TimeSlot[] = [];
-    for (let hour = 6; hour < 23; hour++) {
-      const h = hour.toString().padStart(2, "0");
-      const next = (hour + 1).toString().padStart(2, "0");
-      slots.push({
-        id: `slot-${hour - 5}`, // slot-1 … slot-17
-        time: `${h}:00 - ${next}:00`,
-        available: Math.random() > 0.3, // 70 % chance available
-      });
+    if (!courtId) {
+      router.push("/");
+      return;
     }
-    setTimeSlots(slots);
-  }, [selectedDate]);
+
+    const fetchCourt = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/courts?id=${courtId}`);
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch court information");
+        }
+
+        const courtData = await response.json();
+        setSelectedCourt(courtData);
+
+        // Set default date to today
+        const today = new Date().toISOString().split("T")[0];
+        setSelectedDate(today);
+      } catch (err) {
+        console.error("Error fetching court:", err);
+        setError("Failed to load court information. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourt();
+  }, [searchParams, router]);
+
+  /* --- 2. Fetch time slots from API ------------------------------ */
+  useEffect(() => {
+    if (!selectedDate || !selectedCourt) return;
+
+    const fetchTimeSlots = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `/api/slots?courtId=${selectedCourt.id}&date=${selectedDate}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch time slots");
+        }
+
+        const slots = await response.json();
+        setTimeSlots(slots);
+      } catch (err) {
+        console.error("Error fetching time slots:", err);
+        setError("Failed to load time slots. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTimeSlots();
+  }, [selectedDate, selectedCourt]);
 
   /* --- helpers -------------------------------------------------- */
   const formatDate = (iso: string) =>
@@ -108,15 +127,49 @@ export default function BookSlotsClient() {
   };
 
   /* --- render --------------------------------------------------- */
-  if (loading || !selectedCourt)
+  if (loading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="animate-pulse">Loading…</div>
       </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="bg-red-900/20 border border-red-700 rounded-lg p-6 max-w-md text-center">
+          <h2 className="text-xl font-bold mb-2">Error</h2>
+          <p className="text-gray-300 mb-4">{error}</p>
+          <Link
+            href="/"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors"
+          >
+            Return to Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!selectedCourt) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <p className="mb-4">Court not found</p>
+          <Link
+            href="/"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors"
+          >
+            Return to Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-black text-white pt-24 pb-16">
+    <div className="min-h-screen bg-black text-white pt-35 pb-16">
       <div className="container mx-auto px-4">
         {/* back link */}
         <Link
