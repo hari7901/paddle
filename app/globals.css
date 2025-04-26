@@ -1,26 +1,134 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 255, 255, 255;
+  --primary-color: #16a34a; /* green-600 */
+  --primary-dark: #166534; /* green-800 */
+  --primary-light: #4ade80; /* green-400 */
+  --black: #000000;
+  --white: #ffffff;
+  --gray-light: #f9fafb; /* gray-50 */
+  --gray-medium: #9ca3af; /* gray-400 */
+  --gray-dark: #1f2937; /* gray-800 */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground-rgb: 255, 255, 255;
+    --background-rgb: 0, 0, 0;
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.animate-slide-right {
+  animation: slideInFromRight 0.8s ease-out forwards;
+}
+
+.animate-slide-left {
+  animation: slideInFromLeft 0.8s ease-out forwards;
+}
+
+/* Custom button styles */
+.btn-primary {
+  @apply bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition-all duration-300 transform hover:scale-105;
+}
+
+.btn-secondary {
+  @apply bg-black hover:bg-gray-800 text-white font-medium py-2 px-6 rounded-lg transition-all duration-300;
+}
+
+.btn-outline {
+  @apply border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white font-medium py-2 px-6 rounded-lg transition-colors duration-300;
+}
+
+/* Custom card styles */
+.card {
+  @apply bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl;
+}
+
+.card-dark {
+  @apply bg-gray-900 rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl border border-green-900;
+}
+
+/* Section styles */
+.section {
+  @apply py-20;
+}
+
+/* Form styles */
+.form-input {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300;
+}
+
+.form-label {
+  @apply block text-gray-700 font-medium mb-2;
+}
+
+/* Hover effects */
+.hover-lift {
+  @apply transition-transform duration-300 hover:transform hover:-translate-y-1;
+}
+
+/* Green glow effect for highlighted elements */
+.green-glow {
+  @apply transition-all duration-300;
+  box-shadow: 0 0 15px rgba(22, 163, 74, 0.4);
+}
+
+.green-glow:hover {
+  box-shadow: 0 0 25px rgba(22, 163, 74, 0.6);
+}
+
+/* Gradient text */
+.gradient-text {
+  @apply font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-600;
 }
