@@ -2,26 +2,28 @@ import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/app/lib/db";
 import Booking from "@/app/lib/models/Bookings";
 import { sendBookingAlert } from "@/app/lib/email";
-import { sendWhatsAppConfirmation } from "@/app/lib/whatsapp"; 
 
 export async function POST(request: NextRequest) {
   try {
     await connectToDatabase();
+
     const {
       courtId,
       courtName,
       courtType,
       price,
+
       date,
       slotId,
       time,
+
       name,
       email,
       phone,
       paymentMethod,
     } = await request.json();
 
-    /* ---------- validation (unchanged) ---------- */
+    // simple presence check
     if (
       !courtId ||
       !courtName ||
@@ -31,21 +33,24 @@ export async function POST(request: NextRequest) {
       !slotId ||
       !time ||
       !name ||
+      !email ||
       !phone ||
       !paymentMethod
     ) {
-      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+      return NextResponse.json(
+        { error: "All fields are required" },
+        { status: 400 }
+      );
     }
 
-    /* ---------- clash check ---------- */
+    // already booked?
     const clash = await Booking.findOne({ courtId, date, slotId });
     if (clash)
       return NextResponse.json(
-        { error: "Slot already booked" },
+        { error: "This slot is already booked" },
         { status: 409 }
       );
 
-    /* ---------- save ---------- */
     const booking = await Booking.create({
       courtId,
       courtName,
@@ -60,24 +65,12 @@ export async function POST(request: NextRequest) {
       paymentMethod,
     });
 
-    /* ---------- alerts ---------- */
+    // email the admin – don’t await block user response
     sendBookingAlert(booking.toObject()).catch(console.error);
-
-    /* NEW: WhatsApp confirmation (fire-and-forget) */
-    sendWhatsAppConfirmation({
-      _id: booking._id.toString(),
-      name,
-      phone,
-      courtName,
-      courtType,
-      date,
-      time,
-      price,
-    }).catch(console.error);
 
     return NextResponse.json({ success: true, data: booking }, { status: 201 });
   } catch (err) {
-    console.error(err);
+    console.error("DB error:", err);
     return NextResponse.json(
       { error: "Failed to create booking" },
       { status: 500 }
