@@ -1,11 +1,10 @@
-// app/components/HeroSection.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const HeroSection = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState<number>(0);
 
   const slides = [
     {
@@ -48,7 +47,8 @@ const HeroSection = () => {
     );
   };
 
-  const goToSpecificSlide = (index) => {
+  // ← here we’ve added a type annotation for index
+  const goToSpecificSlide = (index: number): void => {
     setCurrentSlide(index);
   };
 
