@@ -1,13 +1,19 @@
 // app/book-slots/page.tsx
-// (Server Component – no hooks)
+// Server Component – no hooks
 
-import dynamic from "next/dynamic";
-
-// Dynamically import the real client component
-const BookSlotsClient = dynamic(() => import("./BookSlotsClient"), {
-  ssr: false, // ⬅️  prevents hooks from running during SSR
-});
+import { Suspense } from "react";
+import BookSlotsClient from "./BookSlotsClient"; // <- plain import
 
 export default function BookSlotsPage() {
-  return <BookSlotsClient />;
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-black text-white flex items-center justify-center">
+          Loading…
+        </div>
+      }
+    >
+      <BookSlotsClient />
+    </Suspense>
+  );
 }
