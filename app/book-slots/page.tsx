@@ -1,6 +1,6 @@
-// app/book-slots/page.tsx
 "use client";
 
+import React, { Suspense } from "react";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 
+// Types for slots and courts
 type TimeSlot = {
   id: string;
   time: string;
@@ -27,7 +28,7 @@ type Court = {
   image: string;
 };
 
-const BookSlotsPage = () => {
+function BookSlotsPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -35,15 +36,13 @@ const BookSlotsPage = () => {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Get court ID from URL parameters
+  // Initialize court data and today's date
   useEffect(() => {
     const courtId = searchParams.get("courtId") || "";
-
-    // Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split("T")[0];
     setSelectedDate(today);
 
-    // In a real app, you would fetch court details from your API
+    // Mock court lookup—replace with API call as needed
     if (courtId === "court-1") {
       setSelectedCourt({
         id: "court-1",
@@ -65,28 +64,19 @@ const BookSlotsPage = () => {
     setLoading(false);
   }, [searchParams]);
 
-  // Generate time slots for the selected date
+  // Generate time slots when date changes
   useEffect(() => {
     if (selectedDate) {
-      // In a real app, you would fetch this from your API
       const slots: TimeSlot[] = [];
 
-      // Generate slots from 6:00 AM to 11:00 PM
       for (let hour = 6; hour < 23; hour++) {
         const hourString = hour < 10 ? `0${hour}` : `${hour}`;
         const nextHourString = hour + 1 < 10 ? `0${hour + 1}` : `${hour + 1}`;
-
-        const slotId = `slot-${hour - 5}`; // slot-1 to slot-17
+        const slotId = `slot-${hour - 5}`;
         const time = `${hourString}:00 - ${nextHourString}:00`;
+        const isAvailable = Math.random() > 0.3;
 
-        // Randomly set some slots as unavailable for demonstration
-        const isAvailable = Math.random() > 0.3; // 70% chance of being available
-
-        slots.push({
-          id: slotId,
-          time,
-          available: isAvailable,
-        });
+        slots.push({ id: slotId, time, available: isAvailable });
       }
 
       setTimeSlots(slots);
@@ -105,23 +95,21 @@ const BookSlotsPage = () => {
     });
   };
 
-  // Generate dates for next 7 days
+  // Generate next seven days for date picker
   const getNextSevenDays = () => {
-    const dates = [];
+    const dates: { value: string; display: string }[] = [];
     const now = new Date();
 
     for (let i = 0; i < 7; i++) {
       const date = new Date(now);
       date.setDate(now.getDate() + i);
-
-      const formattedDate = date.toISOString().split("T")[0];
-      const displayDate = date.toLocaleDateString("en-US", {
+      const value = date.toISOString().split("T")[0];
+      const display = date.toLocaleDateString("en-US", {
         weekday: "short",
         month: "short",
         day: "numeric",
       });
-
-      dates.push({ value: formattedDate, display: displayDate });
+      dates.push({ value, display });
     }
 
     return dates;
@@ -129,26 +117,25 @@ const BookSlotsPage = () => {
 
   const availableDates = getNextSevenDays();
 
+  // Handle slot click navigation
   const handleSlotClick = (slotId: string, time: string) => {
-    if (selectedCourt) {
-      const params = new URLSearchParams({
-        date: selectedDate,
-        courtId: selectedCourt.id,
-        courtName: selectedCourt.name,
-        courtType: selectedCourt.type,
-        price: selectedCourt.price.toString(),
-        slotId: slotId,
-        time: time,
-      });
-
-      router.push(`/book?${params.toString()}`);
-    }
+    if (!selectedCourt) return;
+    const params = new URLSearchParams({
+      date: selectedDate,
+      courtId: selectedCourt.id,
+      courtName: selectedCourt.name,
+      courtType: selectedCourt.type,
+      price: selectedCourt.price.toString(),
+      slotId,
+      time,
+    });
+    router.push(`/book?${params.toString()}`);
   };
 
   if (loading || !selectedCourt) {
     return (
       <div className="min-h-screen bg-black text-white pt-24 pb-16 flex items-center justify-center">
-        <div className="animate-pulse">Loading...</div>
+        <div className="animate-pulse">Loading…</div>
       </div>
     );
   }
@@ -160,32 +147,31 @@ const BookSlotsPage = () => {
           href="/"
           className="inline-flex items-center text-gray-300 hover:text-green-400 mb-6"
         >
-          <ArrowLeft size={16} className="mr-2" />
-          Back to Home
+          <ArrowLeft size={16} className="mr-2" /> Back to Home
         </Link>
 
         <div className="flex flex-col md:flex-row gap-8 mb-8">
+          {/* Court preview card */}
           <div className="md:w-1/3">
             <div
               className="h-48 rounded-lg bg-cover bg-center relative overflow-hidden"
               style={{ backgroundImage: `url(${selectedCourt.image})` }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent flex items-end p-6">
-                <div>
-                  <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">
-                    {selectedCourt.type}
-                  </span>
-                  <h1 className="text-white text-2xl font-bold mt-2">
-                    {selectedCourt.name}
-                  </h1>
-                  <p className="text-green-400 font-bold mt-1">
-                    ₹{selectedCourt.price}/hour
-                  </p>
-                </div>
+                <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">
+                  {selectedCourt.type}
+                </span>
+                <h1 className="text-white text-2xl font-bold mt-2">
+                  {selectedCourt.name}
+                </h1>
+                <p className="text-green-400 font-bold mt-1">
+                  ₹{selectedCourt.price}/hour
+                </p>
               </div>
             </div>
           </div>
 
+          {/* Date picker */}
           <div className="md:w-2/3">
             <h2 className="text-2xl font-bold mb-4">Select a Date & Time</h2>
             <p className="text-gray-300 mb-6">
@@ -203,7 +189,8 @@ const BookSlotsPage = () => {
                       selectedDate === date.value
                         ? "bg-green-600 text-white border-green-600"
                         : "border-gray-700 hover:border-green-600 text-gray-300"
-                    }`}
+                    }
+                    `}
                     onClick={() => setSelectedDate(date.value)}
                   >
                     {date.display}
@@ -214,15 +201,15 @@ const BookSlotsPage = () => {
           </div>
         </div>
 
+        {/* Time slots grid */}
         <div className="bg-gray-900 rounded-lg p-6 border-2 border-green-800">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-bold">
               Available Time Slots for {formatDate(selectedDate)}
             </h3>
-
             <div className="text-sm text-gray-300 flex items-center">
-              <Clock size={16} className="mr-2" />
-              Operating Hours: 6:00 AM - 11:00 PM
+              <Clock size={16} className="mr-2" /> Operating Hours: 6:00 AM -
+              11:00 PM
             </div>
           </div>
 
@@ -251,11 +238,11 @@ const BookSlotsPage = () => {
 
           <div className="mt-6 text-sm text-gray-300 bg-gray-800 p-4 rounded-lg">
             <p className="flex items-center">
-              <span className="bg-green-900/40 border border-green-600 w-4 h-4 rounded mr-2"></span>
+              <span className="bg-green-900/40 border border-green-600 w-4 h-4 rounded mr-2" />{" "}
               Available slots can be booked instantly
             </p>
             <p className="flex items-center mt-2">
-              <span className="bg-gray-800 border border-gray-700 w-4 h-4 rounded mr-2"></span>
+              <span className="bg-gray-800 border border-gray-700 w-4 h-4 rounded mr-2" />{" "}
               Unavailable slots are already booked
             </p>
           </div>
@@ -263,6 +250,18 @@ const BookSlotsPage = () => {
       </div>
     </div>
   );
-};
+}
 
-export default BookSlotsPage;
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-black text-white pt-24 pb-16 flex items-center justify-center">
+          Loading available slots…
+        </div>
+      }
+    >
+      <BookSlotsPageContent />
+    </Suspense>
+  );
+}
