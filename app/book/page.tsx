@@ -1,4 +1,3 @@
-// app/book/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -22,7 +21,7 @@ const BookPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
 
-  // Get booking details from URL parameters
+  // Booking details from query string
   const date = searchParams.get("date") || "";
   const courtId = searchParams.get("courtId") || "";
   const courtName = searchParams.get("courtName") || "";
@@ -40,17 +39,16 @@ const BookPage = () => {
     agreeToTerms: false,
   });
 
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
+  /* ----------------------- helpers ----------------------- */
+  const formatDate = (iso: string) =>
+    iso
+      ? new Date(iso).toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "";
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -63,42 +61,38 @@ const BookPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate form
     if (
       !formData.name ||
       !formData.email ||
       !formData.phone ||
       !formData.agreeToTerms
     ) {
-      alert("Please fill in all required fields and agree to the terms.");
+      window.alert(
+        "Please fill in all required fields and agree to the terms."
+      );
       return;
     }
 
-    // Submit booking
     setIsSubmitting(true);
-
-    // Simulate booking API call
     setTimeout(() => {
       setIsSubmitting(false);
       setBookingComplete(true);
-
-      // In a real application, you would make an API call to your backend
-      // to create the booking in your database
+      // TODO: replace with real API call
     }, 1500);
   };
 
-  // If booking parameters are missing, redirect to the home page
+  /* Redirect if params missing */
   useEffect(() => {
-    if (!date || !courtId || !time) {
-      router.push("/");
-    }
+    if (!date || !courtId || !time) router.push("/");
   }, [date, courtId, time, router]);
 
+  /* ----------------------- render ------------------------ */
   if (bookingComplete) {
     return (
       <div className="min-h-screen bg-black text-white pt-24 pb-16">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto bg-gray-900 rounded-lg p-8 border-2 border-green-800">
+            {/* Confirmation header */}
             <div className="text-center mb-8">
               <div className="bg-green-600 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Check size={32} />
@@ -109,6 +103,7 @@ const BookPage = () => {
               </p>
             </div>
 
+            {/* Summary */}
             <div className="border-t border-b border-gray-700 py-6 mb-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -132,36 +127,30 @@ const BookPage = () => {
               </div>
             </div>
 
+            {/* Instructions */}
             <div className="mb-8">
               <h2 className="font-bold text-xl mb-3">Booking Instructions</h2>
               <ul className="space-y-2 text-gray-300">
                 <li className="flex items-start">
                   <span className="text-green-400 mr-2">•</span>
-                  <span>
-                    Please arrive 15 minutes before your booking time.
-                  </span>
+                  Please arrive 15 minutes before your booking time.
                 </li>
                 <li className="flex items-start">
                   <span className="text-green-400 mr-2">•</span>
-                  <span>
-                    Bring your booking confirmation (sent to your email).
-                  </span>
+                  Bring your booking confirmation (sent to your email).
                 </li>
                 <li className="flex items-start">
                   <span className="text-green-400 mr-2">•</span>
-                  <span>
-                    Sports shoes are mandatory for playing on our courts.
-                  </span>
+                  Sports shoes are mandatory on our courts.
                 </li>
                 <li className="flex items-start">
                   <span className="text-green-400 mr-2">•</span>
-                  <span>
-                    Equipment rental is available at an additional cost.
-                  </span>
+                  Equipment rental is available at an additional cost.
                 </li>
               </ul>
             </div>
 
+            {/* CTA */}
             <div className="flex justify-center">
               <Link
                 href="/"
@@ -176,6 +165,7 @@ const BookPage = () => {
     );
   }
 
+  /* ---------------- booking form ---------------- */
   return (
     <div className="min-h-screen bg-black text-white pt-24 pb-16">
       <div className="container mx-auto px-4">
@@ -193,7 +183,7 @@ const BookPage = () => {
             Fill in your details to confirm your court reservation.
           </p>
 
-          {/* Booking Summary */}
+          {/* Booking summary */}
           <div className="bg-gray-900 rounded-lg p-6 border-2 border-green-800 mb-8">
             <h2 className="text-xl font-bold mb-4">Booking Summary</h2>
 
@@ -203,7 +193,6 @@ const BookPage = () => {
                 <span className="text-gray-300 mr-2">Date:</span>
                 <span className="font-medium">{formatDate(date)}</span>
               </div>
-
               <div className="flex items-center">
                 <Clock size={18} className="text-green-400 mr-2" />
                 <span className="text-gray-300 mr-2">Time:</span>
@@ -215,13 +204,14 @@ const BookPage = () => {
               <div
                 className="bg-gray-800 h-12 w-12 rounded-md overflow-hidden mr-3 mt-1 flex-shrink-0"
                 style={{
-                  backgroundImage: `url(${
-                    courtType === "Singles" ? "/paddle3.jpg" : "/paddle4.jpg"
-                  })`,
+                  backgroundImage:
+                    courtType === "Singles"
+                      ? "url('/paddle3.jpg')"
+                      : "url('/paddle4.jpg')",
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                 }}
-              ></div>
+              />
               <div>
                 <p className="font-medium">{courtName}</p>
                 <p className="text-gray-400 text-sm">{courtType} Court</p>
@@ -230,11 +220,11 @@ const BookPage = () => {
             </div>
           </div>
 
-          {/* Booking Form */}
+          {/* Personal-info & payment form */}
           <div className="bg-gray-900 rounded-lg p-6 border-2 border-green-800">
             <h2 className="text-xl font-bold mb-6">Personal Information</h2>
-
             <form onSubmit={handleSubmit}>
+              {/* name */}
               <div className="mb-4">
                 <label htmlFor="name" className="block text-gray-300 mb-2">
                   Full Name *
@@ -249,13 +239,14 @@ const BookPage = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="bg-gray-800 border border-gray-700 rounded-lg py-2 px-10 w-full text-white focus:border-green-500 focus:ring-1 focus:ring-green-500"
-                    placeholder="Your full name"
                     required
+                    placeholder="Your full name"
+                    className="bg-gray-800 border border-gray-700 rounded-lg py-2 px-10 w-full text-white focus:border-green-500 focus:ring-1 focus:ring-green-500"
                   />
                 </div>
               </div>
 
+              {/* email */}
               <div className="mb-4">
                 <label htmlFor="email" className="block text-gray-300 mb-2">
                   Email Address *
@@ -270,13 +261,14 @@ const BookPage = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="bg-gray-800 border border-gray-700 rounded-lg py-2 px-10 w-full text-white focus:border-green-500 focus:ring-1 focus:ring-green-500"
-                    placeholder="your.email@example.com"
                     required
+                    placeholder="your.email@example.com"
+                    className="bg-gray-800 border border-gray-700 rounded-lg py-2 px-10 w-full text-white focus:border-green-500 focus:ring-1 focus:ring-green-500"
                   />
                 </div>
               </div>
 
+              {/* phone */}
               <div className="mb-6">
                 <label htmlFor="phone" className="block text-gray-300 mb-2">
                   Phone Number *
@@ -291,17 +283,17 @@ const BookPage = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="bg-gray-800 border border-gray-700 rounded-lg py-2 px-10 w-full text-white focus:border-green-500 focus:ring-1 focus:ring-green-500"
-                    placeholder="Your phone number"
                     required
+                    placeholder="Your phone number"
+                    className="bg-gray-800 border border-gray-700 rounded-lg py-2 px-10 w-full text-white focus:border-green-500 focus:ring-1 focus:ring-green-500"
                   />
                 </div>
               </div>
 
+              {/* payment */}
               <h2 className="text-xl font-bold mb-4">Payment Method</h2>
-
               <div className="mb-6">
-                <div className="flex items-center mb-3">
+                <label className="flex items-center mb-3">
                   <input
                     type="radio"
                     id="card"
@@ -311,13 +303,11 @@ const BookPage = () => {
                     onChange={handleInputChange}
                     className="mr-2 text-green-500 focus:ring-green-500"
                   />
-                  <label htmlFor="card" className="flex items-center">
-                    <CreditCard size={16} className="mr-2 text-gray-400" />
-                    Credit/Debit Card
-                  </label>
-                </div>
+                  <CreditCard size={16} className="mr-2 text-gray-400" />
+                  Credit/Debit Card
+                </label>
 
-                <div className="flex items-center">
+                <label className="flex items-center">
                   <input
                     type="radio"
                     id="cash"
@@ -327,31 +317,30 @@ const BookPage = () => {
                     onChange={handleInputChange}
                     className="mr-2 text-green-500 focus:ring-green-500"
                   />
-                  <label htmlFor="cash">Pay at Location</label>
-                </div>
+                  Pay at Location
+                </label>
               </div>
 
+              {/* terms */}
               <div className="mb-8">
-                <div className="flex items-start">
+                <label className="flex items-start">
                   <input
                     type="checkbox"
                     id="agreeToTerms"
                     name="agreeToTerms"
                     checked={formData.agreeToTerms}
                     onChange={handleInputChange}
-                    className="mt-1 mr-2 text-green-500 focus:ring-green-500"
                     required
+                    className="mt-1 mr-2 text-green-500 focus:ring-green-500"
                   />
-                  <label
-                    htmlFor="agreeToTerms"
-                    className="text-gray-300 text-sm"
-                  >
+                  <span className="text-gray-300 text-sm">
                     I agree to the booking terms and conditions, including the
                     cancellation policy.
-                  </label>
-                </div>
+                  </span>
+                </label>
               </div>
 
+              {/* submit */}
               <motion.button
                 type="submit"
                 disabled={isSubmitting}
@@ -378,14 +367,14 @@ const BookPage = () => {
                         r="10"
                         stroke="currentColor"
                         strokeWidth="4"
-                      ></circle>
+                      />
                       <path
                         className="opacity-75"
                         fill="currentColor"
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
+                      />
                     </svg>
-                    Processing...
+                    Processing…
                   </>
                 ) : (
                   "Confirm Booking"

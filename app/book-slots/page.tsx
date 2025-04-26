@@ -1,19 +1,14 @@
 "use client";
 
-import React, { Suspense } from "react";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  Calendar,
   Clock,
   ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 
-// Types for slots and courts
 type TimeSlot = {
   id: string;
   time: string;
@@ -28,7 +23,7 @@ type Court = {
   image: string;
 };
 
-function BookSlotsPageContent() {
+const BookSlotsPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -36,13 +31,17 @@ function BookSlotsPageContent() {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Initialize court data and today's date
+  /* -------------------------------------------------- */
+  /* 1. Court details from query string                 */
+  /* -------------------------------------------------- */
   useEffect(() => {
     const courtId = searchParams.get("courtId") || "";
+
+    // today in YYYY-MM-DD
     const today = new Date().toISOString().split("T")[0];
     setSelectedDate(today);
 
-    // Mock court lookup—replace with API call as needed
+    // demo data – swap for API call in production
     if (courtId === "court-1") {
       setSelectedCourt({
         id: "court-1",
@@ -64,62 +63,59 @@ function BookSlotsPageContent() {
     setLoading(false);
   }, [searchParams]);
 
-  // Generate time slots when date changes
+  /* -------------------------------------------------- */
+  /* 2. Generate demo time-slots                        */
+  /* -------------------------------------------------- */
   useEffect(() => {
-    if (selectedDate) {
-      const slots: TimeSlot[] = [];
+    if (!selectedDate) return;
 
-      for (let hour = 6; hour < 23; hour++) {
-        const hourString = hour < 10 ? `0${hour}` : `${hour}`;
-        const nextHourString = hour + 1 < 10 ? `0${hour + 1}` : `${hour + 1}`;
-        const slotId = `slot-${hour - 5}`;
-        const time = `${hourString}:00 - ${nextHourString}:00`;
-        const isAvailable = Math.random() > 0.3;
+    const slots: TimeSlot[] = [];
 
-        slots.push({ id: slotId, time, available: isAvailable });
-      }
+    // 6 AM → 11 PM
+    for (let hour = 6; hour < 23; hour++) {
+      const hourStr = hour.toString().padStart(2, "0");
+      const nextStr = (hour + 1).toString().padStart(2, "0");
 
-      setTimeSlots(slots);
+      slots.push({
+        id: `slot-${hour - 5}`, // slot-1 … slot-17
+        time: `${hourStr}:00 - ${nextStr}:00`,
+        available: Math.random() > 0.3, // 70 % chance
+      });
     }
+
+    setTimeSlots(slots);
   }, [selectedDate]);
 
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+  /* -------------------------------------------------- */
+  /* Helpers                                            */
+  /* -------------------------------------------------- */
+  const formatDate = (iso: string) =>
+    iso
+      ? new Date(iso).toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "";
+
+  const getNextSevenDays = () =>
+    Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      return {
+        value: date.toISOString().split("T")[0],
+        display: date.toLocaleDateString("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+        }),
+      };
     });
-  };
 
-  // Generate next seven days for date picker
-  const getNextSevenDays = () => {
-    const dates: { value: string; display: string }[] = [];
-    const now = new Date();
-
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(now);
-      date.setDate(now.getDate() + i);
-      const value = date.toISOString().split("T")[0];
-      const display = date.toLocaleDateString("en-US", {
-        weekday: "short",
-        month: "short",
-        day: "numeric",
-      });
-      dates.push({ value, display });
-    }
-
-    return dates;
-  };
-
-  const availableDates = getNextSevenDays();
-
-  // Handle slot click navigation
   const handleSlotClick = (slotId: string, time: string) => {
     if (!selectedCourt) return;
+
     const params = new URLSearchParams({
       date: selectedDate,
       courtId: selectedCourt.id,
@@ -129,16 +125,22 @@ function BookSlotsPageContent() {
       slotId,
       time,
     });
+
     router.push(`/book?${params.toString()}`);
   };
 
+  /* -------------------------------------------------- */
+  /* Render                                             */
+  /* -------------------------------------------------- */
   if (loading || !selectedCourt) {
     return (
       <div className="min-h-screen bg-black text-white pt-24 pb-16 flex items-center justify-center">
-        <div className="animate-pulse">Loading…</div>
+        <div className="animate-pulse">Loading...</div>
       </div>
     );
   }
+
+  const availableDates = getNextSevenDays();
 
   return (
     <div className="min-h-screen bg-black text-white pt-24 pb-16">
@@ -147,33 +149,38 @@ function BookSlotsPageContent() {
           href="/"
           className="inline-flex items-center text-gray-300 hover:text-green-400 mb-6"
         >
-          <ArrowLeft size={16} className="mr-2" /> Back to Home
+          <ArrowLeft size={16} className="mr-2" />
+          Back to Home
         </Link>
 
         <div className="flex flex-col md:flex-row gap-8 mb-8">
-          {/* Court preview card */}
+          {/* COURT CARD -------------------------------------- */}
           <div className="md:w-1/3">
             <div
               className="h-48 rounded-lg bg-cover bg-center relative overflow-hidden"
               style={{ backgroundImage: `url(${selectedCourt.image})` }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent flex items-end p-6">
-                <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">
-                  {selectedCourt.type}
-                </span>
-                <h1 className="text-white text-2xl font-bold mt-2">
-                  {selectedCourt.name}
-                </h1>
-                <p className="text-green-400 font-bold mt-1">
-                  ₹{selectedCourt.price}/hour
-                </p>
+                <div>
+                  <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">
+                    {selectedCourt.type}
+                  </span>
+                  <h1 className="text-white text-2xl font-bold mt-2">
+                    {selectedCourt.name}
+                  </h1>
+                  <p className="text-green-400 font-bold mt-1">
+                    ₹{selectedCourt.price}/hour
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Date picker */}
+          {/* DATE PICKER ------------------------------------ */}
           <div className="md:w-2/3">
-            <h2 className="text-2xl font-bold mb-4">Select a Date & Time</h2>
+            <h2 className="text-2xl font-bold mb-4">
+              Select a Date &amp; Time
+            </h2>
             <p className="text-gray-300 mb-6">
               Choose from available time slots to book your court.
             </p>
@@ -189,8 +196,7 @@ function BookSlotsPageContent() {
                       selectedDate === date.value
                         ? "bg-green-600 text-white border-green-600"
                         : "border-gray-700 hover:border-green-600 text-gray-300"
-                    }
-                    `}
+                    }`}
                     onClick={() => setSelectedDate(date.value)}
                   >
                     {date.display}
@@ -201,15 +207,15 @@ function BookSlotsPageContent() {
           </div>
         </div>
 
-        {/* Time slots grid */}
+        {/* TIME-SLOTS GRID ---------------------------------- */}
         <div className="bg-gray-900 rounded-lg p-6 border-2 border-green-800">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-bold">
               Available Time Slots for {formatDate(selectedDate)}
             </h3>
             <div className="text-sm text-gray-300 flex items-center">
-              <Clock size={16} className="mr-2" /> Operating Hours: 6:00 AM -
-              11:00 PM
+              <Clock size={16} className="mr-2" />
+              Operating Hours: 6:00 AM – 11:00 PM
             </div>
           </div>
 
@@ -238,11 +244,11 @@ function BookSlotsPageContent() {
 
           <div className="mt-6 text-sm text-gray-300 bg-gray-800 p-4 rounded-lg">
             <p className="flex items-center">
-              <span className="bg-green-900/40 border border-green-600 w-4 h-4 rounded mr-2" />{" "}
+              <span className="bg-green-900/40 border border-green-600 w-4 h-4 rounded mr-2" />
               Available slots can be booked instantly
             </p>
             <p className="flex items-center mt-2">
-              <span className="bg-gray-800 border border-gray-700 w-4 h-4 rounded mr-2" />{" "}
+              <span className="bg-gray-800 border border-gray-700 w-4 h-4 rounded mr-2" />
               Unavailable slots are already booked
             </p>
           </div>
@@ -250,18 +256,6 @@ function BookSlotsPageContent() {
       </div>
     </div>
   );
-}
+};
 
-export default function Page() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-black text-white pt-24 pb-16 flex items-center justify-center">
-          Loading available slots…
-        </div>
-      }
-    >
-      <BookSlotsPageContent />
-    </Suspense>
-  );
-}
+export default BookSlotsPage;

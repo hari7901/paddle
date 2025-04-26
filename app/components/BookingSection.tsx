@@ -1,12 +1,11 @@
-// app/components/BookingSection.tsx
 "use client";
 
 import { motion } from "framer-motion";
-import { Calendar, Clock, Shield, Award, MapPin } from "lucide-react";
+import { Calendar, Shield, Award } from "lucide-react";
 import BookingPreview from "./BookingPreview";
 
 const BookingSection = () => {
-  // Court data with features
+  /* court data -------------------------------------------------- */
   const courts = [
     {
       id: "court-1",
@@ -36,42 +35,36 @@ const BookingSection = () => {
     },
   ];
 
-  // Animation variants
+  /* framer variants -------------------------------------------- */
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
+      transition: { staggerChildren: 0.2 },
     },
   };
-
   const itemVariants = {
     hidden: { y: 30, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: {
-        type: "spring",
-        damping: 15,
-        stiffness: 60,
-      },
+      transition: { type: "spring", damping: 15, stiffness: 60 },
     },
   };
 
+  /* render ------------------------------------------------------ */
   return (
     <div
-      className="py-20 bg-black text-white relative overflow-hidden"
       id="booking"
+      className="py-20 bg-black text-white relative overflow-hidden"
     >
-      {/* Decorative elements */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-900/0 via-green-600 to-green-900/0"></div>
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-900/20 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-green-900/20 rounded-full blur-3xl"></div>
+      {/* decorative lines & blobs */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-900/0 via-green-600 to-green-900/0" />
+      <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-900/20 rounded-full blur-3xl" />
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-green-900/20 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Section Header */}
+        {/* header */}
         <div className="text-center mb-16">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -107,13 +100,13 @@ const BookingSection = () => {
           </motion.p>
         </div>
 
-        {/* Court Cards */}
+        {/* court cards */}
         <motion.div
-          className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
+          className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16"
         >
           {courts.map((court) => (
             <motion.div
@@ -133,7 +126,7 @@ const BookingSection = () => {
           ))}
         </motion.div>
 
-        {/* Booking Features */}
+        {/* features */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -144,8 +137,8 @@ const BookingSection = () => {
           <h3 className="text-2xl font-bold mb-8 text-center">
             Why Book With Us
           </h3>
-
           <div className="grid md:grid-cols-3 gap-8">
+            {/* item 1 */}
             <div className="flex flex-col items-center text-center">
               <div className="w-16 h-16 rounded-full bg-green-900/30 flex items-center justify-center mb-4">
                 <Calendar className="h-8 w-8 text-green-400" />
@@ -155,32 +148,30 @@ const BookingSection = () => {
                 Book your slot anytime from 6:00 AM to 11:00 PM, 7 days a week.
               </p>
             </div>
-
+            {/* item 2 */}
             <div className="flex flex-col items-center text-center">
               <div className="w-16 h-16 rounded-full bg-green-900/30 flex items-center justify-center mb-4">
                 <Shield className="h-8 w-8 text-green-400" />
               </div>
               <h4 className="text-lg font-bold mb-2">Secure Payments</h4>
               <p className="text-gray-400">
-                Easily pay online or at the venue with our secure payment
-                system.
+                Easily pay online or at the venue with our secure system.
               </p>
             </div>
-
+            {/* item 3 */}
             <div className="flex flex-col items-center text-center">
               <div className="w-16 h-16 rounded-full bg-green-900/30 flex items-center justify-center mb-4">
                 <Award className="h-8 w-8 text-green-400" />
               </div>
               <h4 className="text-lg font-bold mb-2">Premium Facilities</h4>
               <p className="text-gray-400">
-                Experience professional-grade courts with exceptional playing
-                surfaces.
+                Experience professional-grade courts with exceptional surfaces.
               </p>
             </div>
           </div>
         </motion.div>
 
-        {/* Schedule Preview */}
+        {/* schedule preview (demo) */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -194,7 +185,7 @@ const BookingSection = () => {
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-xl font-bold">Today's Schedule</h3>
                   <div className="text-green-400 font-medium">
-                    6:00 AM - 11:00 PM
+                    6:00 AM – 11:00 PM
                   </div>
                 </div>
 
@@ -204,9 +195,9 @@ const BookingSection = () => {
                     { time: "10:00", status: "Booked" },
                     { time: "11:00", status: "Available" },
                     { time: "12:00", status: "Available" },
-                  ].map((slot, index) => (
+                  ].map((slot, i) => (
                     <div
-                      key={index}
+                      key={i}
                       className={`p-3 rounded-lg border ${
                         slot.status === "Available"
                           ? "border-green-600 bg-green-900/20 text-white"
@@ -238,9 +229,9 @@ const BookingSection = () => {
               </div>
             </div>
 
-            {/* Decorative elements */}
-            <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-green-600/10 rounded-full blur-2xl"></div>
-            <div className="absolute -top-4 -left-4 w-24 h-24 bg-green-600/10 rounded-full blur-xl"></div>
+            {/* decorative blobs */}
+            <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-green-600/10 rounded-full blur-2xl" />
+            <div className="absolute -top-4 -left-4 w-24 h-24 bg-green-600/10 rounded-full blur-xl" />
           </div>
         </motion.div>
       </div>
