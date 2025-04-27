@@ -1,7 +1,9 @@
+// app/api/bookings/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/app/lib/db";
 import Booking from "@/app/lib/models/Bookings";
 
+/* ─────────────────────────  POST  /api/bookings  ───────────────────────── */
 export async function POST(req: NextRequest) {
   try {
     await connectToDatabase();
@@ -11,17 +13,17 @@ export async function POST(req: NextRequest) {
       courtId,
       courtName,
       courtType,
-      date,
-      slotIds,
-      times, // 👈 arrays
-      price, // already totalled on client
+      date, // "YYYY-MM-DD"
+      slotIds, // string[]
+      times, // string[]
+      price, // number (total)
       name,
       email,
       phone,
-      paymentMethod,
+      paymentMethod, // 'card' | 'cash'
     } = body;
 
-    /* simple validation */
+    /* ---- light validation ------------------------------------ */
     if (
       !courtId ||
       !courtName ||
@@ -36,22 +38,27 @@ export async function POST(req: NextRequest) {
       !phone ||
       !paymentMethod
     ) {
-      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing or invalid fields" },
+        { status: 400 }
+      );
     }
 
-    /* clash check — ANY of the requested slotIds already booked? */
+    /* ---- clash check: ANY of the requested slotIds already booked? ---- */
     const clash = await Booking.findOne({
       courtId,
       date,
       slotIds: { $in: slotIds },
+      status: "CONFIRMED",
     });
-    if (clash)
+    if (clash) {
       return NextResponse.json(
         { error: "Some slot is already booked" },
         { status: 409 }
       );
+    }
 
-    /* create */
+    /* ---- create booking -------------------------------------- */
     const booking = await Booking.create({
       courtId,
       courtName,
@@ -64,14 +71,19 @@ export async function POST(req: NextRequest) {
       email,
       phone,
       paymentMethod,
+      status: "CONFIRMED",
     });
 
     return NextResponse.json({ success: true, data: booking }, { status: 201 });
   } catch (err) {
-    console.error(err);
+    console.error("Booking POST error:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+
+/* ─────────────────────────  GET  /api/bookings  ───────────────────────── */
+/*     • /api/bookings?id=<bookingId>                                      */
+/*     • /api/bookings?email=user@example.com                              */
 export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();
@@ -85,14 +97,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(b);
     }
 
-    if (email) return NextResponse.json(await Booking.find({ email }));
+    if (email) {
+      const list = await Booking.find({ email }).sort({ createdAt: -1 });
+      return NextResponse.json(list);
+    }
 
     return NextResponse.json(
       { error: "Email or ID required" },
       { status: 400 }
     );
   } catch (err) {
-    console.error("DB error:", err);
+    console.error("Booking GET error:", err);
     return NextResponse.json(
       { error: "Failed to fetch bookings" },
       { status: 500 }
