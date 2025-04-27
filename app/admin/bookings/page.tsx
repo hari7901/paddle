@@ -1,7 +1,7 @@
-/* app/admin/bookings/page.tsx */
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import Link from "next/link";
 import {
@@ -11,24 +11,26 @@ import {
   Search,
   XCircle,
   Filter,
+  LogOut,
 } from "lucide-react";
 
+/* ---------- API shape ---------- */
 type Booking = {
   _id: string;
-  name: string;
-  phone: string;
+  createdAt: string;
+  date: string;
+  times: string[];
   courtName: string;
   courtType: string;
   price: number;
-  paymentMethod: string; // "card" | "cash"
-  date: string;
-  time: string;
-  createdAt: string;
+  paymentMethod: "card" | "cash";
+  name: string;
+  phone: string;
 };
 
-const bearer = `Bearer ${process.env.NEXT_PUBLIC_ADMIN_TOKEN}`;
-
 export default function AdminBookings() {
+  const router = useRouter();
+
   /* ---------- state ---------- */
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,18 +46,23 @@ export default function AdminBookings() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/admin/bookings", {
-          headers: { Authorization: bearer },
-        });
+        const res = await fetch("/api/admin/bookings");
+        if (res.status === 401) {
+          router.replace("/admin/login?next=/admin/bookings");
+          return;
+        }
         if (!res.ok) throw new Error();
-        setBookings(await res.json());
+        const data: Booking[] = await res.json();
+        setBookings(
+          data.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
+        );
       } catch {
-        setError("Not authorised or failed to load.");
+        setError("Failed to load bookings.");
       } finally {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [router]);
 
   /* ---------- delete ---------- */
   const handleDelete = async (id: string) => {
@@ -63,8 +70,11 @@ export default function AdminBookings() {
     try {
       const res = await fetch(`/api/admin/bookings/${id}`, {
         method: "DELETE",
-        headers: { Authorization: bearer },
       });
+      if (res.status === 401) {
+        router.replace("/admin/login?next=/admin/bookings");
+        return;
+      }
       if (!res.ok) throw new Error();
       setBookings((prev) => prev.filter((b) => b._id !== id));
     } catch {
@@ -72,40 +82,35 @@ export default function AdminBookings() {
     }
   };
 
-  /* ---------- filter lists ---------- */
+  /* ---------- logout ---------- */
+  const logout = async () => {
+    await fetch("/api/admin/logout", { method: "POST" });
+    router.replace("/admin/login");
+  };
+
+  /* ---------- filter helpers ---------- */
   const courtTypes = useMemo(
     () => Array.from(new Set(bookings.map((b) => b.courtType))).sort(),
     [bookings]
   );
   const timeSlots = useMemo(
-    () => Array.from(new Set(bookings.map((b) => b.time))).sort(),
+    () => Array.from(new Set(bookings.flatMap((b) => b.times))).sort(),
     [bookings]
   );
 
-  /* ---------- combined filtering ---------- */
   const filtered = useMemo(() => {
     return bookings.filter((b) => {
-      const matchesText =
-        !q.trim() ||
-        b.name.toLowerCase().includes(q.toLowerCase()) ||
-        b.phone.includes(q);
-
-      const matchesDate = !filterDate || b.date === filterDate;
-      const matchesCourt = filterCourt === "All" || b.courtType === filterCourt;
-      const matchesTime = filterTime === "All" || b.time === filterTime;
-
-      return matchesText && matchesDate && matchesCourt && matchesTime;
+      const txt = q.trim().toLowerCase();
+      const matchTxt =
+        !txt || b.name.toLowerCase().includes(txt) || b.phone.includes(txt);
+      const matchDate = !filterDate || b.date === filterDate;
+      const matchCourt = filterCourt === "All" || b.courtType === filterCourt;
+      const matchTime = filterTime === "All" || b.times.includes(filterTime);
+      return matchTxt && matchDate && matchCourt && matchTime;
     });
   }, [bookings, q, filterDate, filterCourt, filterTime]);
 
   /* ---------- UI ---------- */
-  if (loading)
-    return (
-      <div className="flex items-center justify-center h-40">
-        <Loader2 className="animate-spin mr-2" /> Loading…
-      </div>
-    );
-
   if (error)
     return (
       <div className="p-8 text-red-500 flex items-center">
@@ -114,16 +119,33 @@ export default function AdminBookings() {
     );
 
   return (
-    <div className="pt-32 px-4 md:px-8 max-w-6xl mx-auto">
-      {/* header with New Booking button */}
+    <div className="pt-32 px-4 md:px-8 max-w-6xl mx-auto relative">
+      {/* overlay spinner */}
+      {loading && (
+        <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-50 rounded-lg">
+          <Loader2 className="animate-spin text-green-500 mr-2" /> Loading…
+        </div>
+      )}
+
+      {/* header */}
       <div className="flex items-center justify-between mb-4 md:mb-6">
         <h1 className="text-3xl font-bold">Bookings</h1>
-        <Link
-          href="/admin/new-booking"
-          className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-1"
-        >
-          <span className="text-xl leading-none">＋</span> New&nbsp;Booking
-        </Link>
+
+        <div className="flex gap-2">
+          <Link
+            href="/admin/new-booking"
+            className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-1"
+          >
+            <span className="text-xl leading-none">＋</span> New&nbsp;Booking
+          </Link>
+
+          <button
+            onClick={logout}
+            className="bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm px-3 py-2 rounded-lg flex items-center gap-1"
+          >
+            <LogOut size={16} /> Log&nbsp;out
+          </button>
+        </div>
       </div>
 
       {/* search */}
@@ -195,19 +217,21 @@ export default function AdminBookings() {
         )}
       </div>
 
-      {/* DESKTOP TABLE */}
+      {/* ───── TABLE (desktop) ───── */}
       <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full border-collapse text-sm">
           <thead className="bg-gray-900 text-gray-300">
             <tr>
-              <th className="px-4 py-3 text-left">Created</th>
-              <th className="px-4 py-3 text-left">Date</th>
-              <th className="px-4 py-3 text-left">Time</th>
-              <th className="px-4 py-3 text-left">Court</th>
-              <th className="px-4 py-3 text-left">Customer</th>
-              <th className="px-4 py-3 text-right">Price</th>
-              <th className="px-4 py-3 text-left">Payment</th>
-              <th className="px-4 py-3 text-center w-16">Cancel</th>
+              <TH>Created</TH>
+              <TH>Date</TH>
+              <TH>Time</TH>
+              <TH>Court</TH>
+              <TH>Customer</TH>
+              <TH align="right">Price</TH>
+              <TH>Payment</TH>
+              <TH align="center" className="w-16">
+                Cancel
+              </TH>
             </tr>
           </thead>
           <tbody>
@@ -220,27 +244,23 @@ export default function AdminBookings() {
                     : "bg-gray-900/40 hover:bg-gray-800"
                 }
               >
-                <td className="px-4 py-3 text-gray-200">
-                  {format(new Date(b.createdAt), "dd MMM yy · HH:mm")}
-                </td>
-                <td className="px-4 py-3 text-gray-200">{b.date}</td>
-                <td className="px-4 py-3 text-gray-200">{b.time}</td>
-                <td className="px-4 py-3 text-gray-200">
+                <TD>{format(new Date(b.createdAt), "dd MMM yy · HH:mm")}</TD>
+                <TD>{b.date}</TD>
+                <TD>{b.times.join(", ")}</TD>
+                <TD>
                   {b.courtName}{" "}
                   <span className="text-xs text-gray-400">({b.courtType})</span>
-                </td>
-                <td className="px-4 py-3 text-gray-200">
+                </TD>
+                <TD>
                   {b.name}
                   <br />
                   <span className="text-gray-400">{b.phone}</span>
-                </td>
-                <td className="px-4 py-3 text-right text-gray-200">
+                </TD>
+                <TD align="right" className="text-green-400 font-semibold">
                   ₹{b.price}
-                </td>
-                <td className="px-4 py-3 text-gray-200">
-                  {b.paymentMethod === "card" ? "Card" : "Pay on site"}
-                </td>
-                <td className="px-4 py-3 text-center">
+                </TD>
+                <TD>{b.paymentMethod === "card" ? "Card" : "Pay on site"}</TD>
+                <TD align="center">
                   <button
                     onClick={() => handleDelete(b._id)}
                     className="text-red-500 hover:text-red-600"
@@ -248,22 +268,22 @@ export default function AdminBookings() {
                   >
                     <Trash2 size={18} />
                   </button>
-                </td>
+                </TD>
               </tr>
             ))}
           </tbody>
         </table>
-        {!filtered.length && (
+        {!filtered.length && !loading && (
           <p className="text-center text-gray-400 mt-8">No bookings match.</p>
         )}
       </div>
 
-      {/* MOBILE CARDS */}
+      {/* ───── CARDS (mobile) ───── */}
       <div className="md:hidden space-y-4">
         {filtered.map((b) => (
           <div
             key={b._id}
-            className="border border-gray-800 rounded-lg p-4 bg-gray-900/70 flex flex-col gap-2"
+            className="border border-gray-800 rounded-lg p-4 bg-gray-900/70"
           >
             <div className="flex justify-between text-xs text-gray-400">
               <span>{format(new Date(b.createdAt), "dd MMM '•' HH:mm")}</span>
@@ -276,32 +296,58 @@ export default function AdminBookings() {
               </button>
             </div>
 
-            <p className="text-sm">
+            <p className="text-sm mt-1">
               <b>{b.courtName}</b> ({b.courtType})
             </p>
 
-            <p className="text-sm">
-              {b.date} • {b.time}
+            <p className="text-sm mt-1">
+              {b.date} • {b.times.join(", ")}
             </p>
 
-            <p className="text-sm">{b.name}</p>
+            <p className="text-sm mt-1">{b.name}</p>
             <p className="text-xs text-gray-400">{b.phone}</p>
 
-            <p className="text-sm">
+            <p className="text-sm mt-1">
               Payment:&nbsp;
               <span className="font-medium text-gray-200">
                 {b.paymentMethod === "card" ? "Card" : "Pay on site"}
               </span>
             </p>
 
-            <p className="text-sm text-green-400 font-semibold">₹{b.price}</p>
+            <p className="text-sm text-green-400 font-semibold mt-1">
+              ₹{b.price}
+            </p>
           </div>
         ))}
 
-        {!filtered.length && (
+        {!filtered.length && !loading && (
           <p className="text-center text-gray-400 mt-6">No bookings found.</p>
         )}
       </div>
     </div>
+  );
+}
+
+/* ---------- tiny TD / TH helpers ---------- */
+function TH(props: {
+  children: React.ReactNode;
+  className?: string;
+  align?: string;
+}) {
+  return (
+    <th
+      className={`px-4 py-3 text-left ${
+        props.align ? `text-${props.align}` : ""
+      } ${props.className ?? ""}`}
+    >
+      {props.children}
+    </th>
+  );
+}
+function TD(props: { children: React.ReactNode; align?: string; className?: string }) {
+  return (
+    <td className={`px-4 py-3 ${props.align ? `text-${props.align}` : ""} ${props.className ?? ""}`}>
+      {props.children}
+    </td>
   );
 }
