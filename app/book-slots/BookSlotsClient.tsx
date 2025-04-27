@@ -22,22 +22,20 @@ export default function BookSlotsClient() {
   const router = useRouter();
 
   const courtId = sp.get("courtId") || "";
-
   const today = new Date().toISOString().split("T")[0];
-  const [date, setDate] = useState(today);
 
+  const [date, setDate] = useState(today);
   const [court, setCourt] = useState<Court | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
-  const [selected, setSel] = useState<Slot[]>([]);
+  const [selected, setSelected] = useState<Slot[]>([]);
+  const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const [error, setErr] = useState<string | null>(null);
-  const [loadingSlots, setLS] = useState(false);
-
-  /* in-memory slot cache  { "2025-05-03|court-1": Slot[] } */
+  /* tiny in-memory cache */
   const cache = useRef<Record<string, Slot[]>>({});
   const abortRef = useRef<AbortController | null>(null);
 
-  /* -------- 1. fetch court (once) ---------------------------- */
+  /* fetch court once ------------------------------------------ */
   useEffect(() => {
     if (!courtId) {
       router.push("/");
@@ -46,48 +44,57 @@ export default function BookSlotsClient() {
     fetch(`/api/courts?id=${courtId}`)
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then(setCourt)
-      .catch(() => setErr("Could not load court.")); // rarely happens
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      .catch(() => setErr("Could not load court."));
+  }, [courtId, router]);
 
-  /* -------- 2. fetch slots every date change ----------------- */
+  /* fetch slots on date change -------------------------------- */
   useEffect(() => {
     if (!courtId) return;
     const key = `${date}|${courtId}`;
 
     if (cache.current[key]) {
-      // instant from cache
       setSlots(cache.current[key]);
+      setSelected([]);
       return;
     }
 
-    if (abortRef.current) abortRef.current.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
+    abortRef.current?.abort();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
 
-    setLS(true);
-    fetch(`/api/slots?courtId=${courtId}&date=${date}`, {
-      signal: controller.signal,
-    })
+    setLoading(true);
+    fetch(`/api/slots?courtId=${courtId}&date=${date}`, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((data: Slot[]) => {
         cache.current[key] = data;
         setSlots(data);
+        setSelected([]);
       })
-      .catch((err) => {
-        if (err.name !== "AbortError") setErr("Could not load slot list.");
+      .catch((e) => {
+        if (e.name !== "AbortError") setErr("Could not load slots.");
       })
-      .finally(() => setLS(false));
+      .finally(() => setLoading(false));
   }, [courtId, date]);
 
-  /* -------- helpers ----------------------------------------- */
-  const fmtLong = (iso: string) =>
-    new Date(iso).toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+  /* helpers --------------------------------------------------- */
+  const toggle = (s: Slot) =>
+    setSelected((p) =>
+      p.find((x) => x.id === s.id) ? p.filter((x) => x.id !== s.id) : [...p, s]
+    );
+
+  const proceed = () => {
+    if (!court || !selected.length) return;
+    const p = new URLSearchParams({
+      date,
+      courtId,
+      courtName: court.name,
+      courtType: court.type,
+      price: (court.price * selected.length).toString(),
+      slotIds: selected.map((s) => s.id).join(","),
+      times: selected.map((s) => s.time).join(","),
     });
+    router.push(`/book?${p.toString()}`);
+  };
 
   const week = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
@@ -102,43 +109,9 @@ export default function BookSlotsClient() {
     };
   });
 
-  const toggle = (s: Slot) =>
-    setSel((prev) =>
-      prev.find((p) => p.id === s.id)
-        ? prev.filter((p) => p.id !== s.id)
-        : [...prev, s]
-    );
-
-  const proceed = () => {
-    if (!court || selected.length === 0) return;
-    const p = new URLSearchParams({
-      date,
-      courtId,
-      courtName: court.name,
-      courtType: court.type,
-      price: (court.price * selected.length).toString(),
-      slotIds: selected.map((s) => s.id).join(","),
-      times: selected.map((s) => s.time).join(","),
-    });
-    router.push(`/book?${p.toString()}`);
-  };
-
-  /* ---------------- render ----------------------------------- */
-  if (error)
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p className="bg-red-900/20 border border-red-700 rounded-lg px-6 py-4">
-          {error}
-        </p>
-      </div>
-    );
-
-  if (!court)
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="animate-pulse">Loading…</div>
-      </div>
-    );
+  /* ----------- render ---------------------------------------- */
+  if (err) return <FullScreen text={err} />;
+  if (!court) return <FullScreen text="Loading…" spinner />;
 
   return (
     <div className="min-h-screen bg-black text-white pt-35 pb-16">
@@ -150,15 +123,15 @@ export default function BookSlotsClient() {
           <ArrowLeft size={16} className="mr-2" /> Back to Home
         </Link>
 
-        {/* card & date picker */}
+        {/* court card & dates */}
         <div className="flex flex-col md:flex-row gap-8 mb-8">
           <CourtCard court={court} />
           <div className="md:w-2/3">
             <h2 className="text-2xl font-bold mb-4">
               Select a Date &amp; Time
             </h2>
-            <p className="text-gray-300 mb-6">Choose the slot(s) you want.</p>
-            <label className="block mb-2 text-white font-medium">Date</label>
+            <p className="text-gray-300 mb-6">Choose your preferred slot(s).</p>
+            <label className="block mb-2 font-medium">Date</label>
             <div className="flex overflow-x-auto pb-2">
               {week.map((d) => (
                 <button
@@ -181,35 +154,50 @@ export default function BookSlotsClient() {
         {/* slot grid */}
         <div className="bg-gray-900 rounded-lg p-6 border-2 border-green-800">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold">Slots • {fmtLong(date)}</h3>
+            <h3 className="text-xl font-bold">
+              Slots • {new Date(date).toLocaleDateString()}
+            </h3>
             <span className="text-sm text-gray-300 flex items-center">
               <Clock size={16} className="mr-2" /> 6 AM – 11 PM
             </span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {loadingSlots
+            {loading
               ? Array.from({ length: 15 }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-14 rounded-lg bg-gray-800 animate-pulse"
+                    className="h-16 rounded-lg bg-gray-800 animate-pulse"
                   />
                 ))
               : slots.map((s) => {
-                  const act = selected.some((sel) => sel.id === s.id);
+                  const isSel = selected.some((x) => x.id === s.id);
+                  const base =
+                    "p-4 rounded-lg text-center border h-16 flex flex-col justify-center";
+
+                  if (!s.available)
+                    return (
+                      <div
+                        key={s.id}
+                        className={`${base} border-red-700 bg-red-900/40 text-red-300
+                                     cursor-default pointer-events-none`}
+                      >
+                        <span>{s.time}</span>
+                        <span className="text-xs mt-0.5">Booked</span>
+                      </div>
+                    );
+
                   return (
                     <motion.div
                       key={s.id}
-                      onClick={() => s.available && toggle(s)}
-                      whileHover={{ scale: s.available ? 1.05 : 1 }}
-                      whileTap={{ scale: s.available ? 0.95 : 1 }}
-                      className={`p-4 rounded-lg text-center cursor-pointer border
+                      onClick={() => toggle(s)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`${base} cursor-pointer
                         ${
-                          !s.available
-                            ? "border-gray-700 bg-gray-800 opacity-50 cursor-not-allowed"
-                            : act
+                          isSel
                             ? "bg-green-600 border-green-600 text-white"
-                            : "border-green-600 bg-green-900/40 hover:bg-green-800"
+                            : "bg-green-900/40 border-green-600 hover:bg-green-800"
                         }`}
                     >
                       {s.time}
@@ -221,14 +209,14 @@ export default function BookSlotsClient() {
           {/* footer */}
           <div className="mt-6 flex justify-between items-center">
             <p className="text-sm">
-              Selected <b>{selected.length}</b> slot(s) • Total&nbsp;
+              Selected <b>{selected.length}</b> • Total&nbsp;
               <span className="text-green-400 font-semibold">
                 ₹{court.price * selected.length}
               </span>
             </p>
             <button
               onClick={proceed}
-              disabled={selected.length === 0}
+              disabled={!selected.length}
               className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg disabled:opacity-50"
             >
               Continue
@@ -240,7 +228,7 @@ export default function BookSlotsClient() {
   );
 }
 
-/* ------------ sub-component for court card ------------------- */
+/* ---------- helpers ---------- */
 function CourtCard({ court }: { court: Court }) {
   return (
     <div className="md:w-1/3">
@@ -258,6 +246,26 @@ function CourtCard({ court }: { court: Court }) {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function FullScreen({
+  text,
+  spinner = false,
+}: {
+  text: string;
+  spinner?: boolean;
+}) {
+  return (
+    <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      {spinner ? (
+        <div className="animate-pulse">{text}</div>
+      ) : (
+        <p className="bg-red-900/20 border border-red-700 rounded-lg px-6 py-4">
+          {text}
+        </p>
+      )}
     </div>
   );
 }
