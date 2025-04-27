@@ -14,12 +14,12 @@ const BookingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    slotId: {
-      type: String,
+    slotIds: {
+      type: [String],
       required: true,
     },
-    time: {
-      type: String,
+    times: {
+      type: [String],
       required: true,
     },
     name: {

@@ -1,83 +1,77 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/app/lib/db";
 import Booking from "@/app/lib/models/Bookings";
-import { sendBookingAlert } from "@/app/lib/email";
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     await connectToDatabase();
+    const body = await req.json();
 
     const {
       courtId,
       courtName,
       courtType,
-      price,
-
       date,
-      slotId,
-      time,
-
+      slotIds,
+      times, // 👈 arrays
+      price, // already totalled on client
       name,
       email,
       phone,
       paymentMethod,
-    } = await request.json();
+    } = body;
 
-    // simple presence check
+    /* simple validation */
     if (
       !courtId ||
       !courtName ||
       !courtType ||
-      price === undefined ||
       !date ||
-      !slotId ||
-      !time ||
+      !Array.isArray(slotIds) ||
+      slotIds.length === 0 ||
+      !Array.isArray(times) ||
+      times.length !== slotIds.length ||
+      price === undefined ||
       !name ||
-      !email ||
       !phone ||
       !paymentMethod
     ) {
-      return NextResponse.json(
-        { error: "All fields are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    // already booked?
-    const clash = await Booking.findOne({ courtId, date, slotId });
+    /* clash check — ANY of the requested slotIds already booked? */
+    const clash = await Booking.findOne({
+      courtId,
+      date,
+      slotIds: { $in: slotIds },
+    });
     if (clash)
       return NextResponse.json(
-        { error: "This slot is already booked" },
+        { error: "Some slot is already booked" },
         { status: 409 }
       );
 
+    /* create */
     const booking = await Booking.create({
       courtId,
       courtName,
       courtType,
-      price,
       date,
-      slotId,
-      time,
+      slotIds,
+      times,
+      price,
       name,
       email,
       phone,
       paymentMethod,
     });
 
-    // email the admin – don’t await block user response
-    sendBookingAlert(booking.toObject()).catch(console.error);
-
     return NextResponse.json({ success: true, data: booking }, { status: 201 });
   } catch (err) {
-    console.error("DB error:", err);
-    return NextResponse.json(
-      { error: "Failed to create booking" },
-      { status: 500 }
-    );
+    console.error(err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
-
 export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();

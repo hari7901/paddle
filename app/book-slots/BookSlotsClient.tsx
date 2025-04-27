@@ -1,13 +1,14 @@
+/* app/book-slots/BookSlotsClient.tsx */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Clock, ArrowLeft } from "lucide-react";
 
 /* ---------- types ---------- */
-type TimeSlot = { id: string; time: string; available: boolean };
+type Slot = { id: string; time: string; available: boolean };
 type Court = {
   id: string;
   name: string;
@@ -17,94 +18,83 @@ type Court = {
 };
 
 export default function BookSlotsClient() {
-  const searchParams = useSearchParams();
+  const sp = useSearchParams();
   const router = useRouter();
 
-  const [selectedDate, setSelectedDate] = useState<string>("");
-  const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const courtId = sp.get("courtId") || "";
 
-  /* --- 1. Fetch court data from API ------------------------------ */
+  const today = new Date().toISOString().split("T")[0];
+  const [date, setDate] = useState(today);
+
+  const [court, setCourt] = useState<Court | null>(null);
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [selected, setSel] = useState<Slot[]>([]);
+
+  const [error, setErr] = useState<string | null>(null);
+  const [loadingSlots, setLS] = useState(false);
+
+  /* in-memory slot cache  { "2025-05-03|court-1": Slot[] } */
+  const cache = useRef<Record<string, Slot[]>>({});
+  const abortRef = useRef<AbortController | null>(null);
+
+  /* -------- 1. fetch court (once) ---------------------------- */
   useEffect(() => {
-    const courtId = searchParams.get("courtId") || "";
     if (!courtId) {
       router.push("/");
       return;
     }
+    fetch(`/api/courts?id=${courtId}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then(setCourt)
+      .catch(() => setErr("Could not load court.")); // rarely happens
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    const fetchCourt = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/courts?id=${courtId}`);
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch court information");
-        }
-
-        const courtData = await response.json();
-        setSelectedCourt(courtData);
-
-        // Set default date to today
-        const today = new Date().toISOString().split("T")[0];
-        setSelectedDate(today);
-      } catch (err) {
-        console.error("Error fetching court:", err);
-        setError("Failed to load court information. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourt();
-  }, [searchParams, router]);
-
-  /* --- 2. Fetch time slots from API ------------------------------ */
+  /* -------- 2. fetch slots every date change ----------------- */
   useEffect(() => {
-    if (!selectedDate || !selectedCourt) return;
+    if (!courtId) return;
+    const key = `${date}|${courtId}`;
 
-    const fetchTimeSlots = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(
-          `/api/slots?courtId=${selectedCourt.id}&date=${selectedDate}`
-        );
+    if (cache.current[key]) {
+      // instant from cache
+      setSlots(cache.current[key]);
+      return;
+    }
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch time slots");
-        }
+    if (abortRef.current) abortRef.current.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
-        const slots = await response.json();
-        setTimeSlots(slots);
-      } catch (err) {
-        console.error("Error fetching time slots:", err);
-        setError("Failed to load time slots. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
+    setLS(true);
+    fetch(`/api/slots?courtId=${courtId}&date=${date}`, {
+      signal: controller.signal,
+    })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((data: Slot[]) => {
+        cache.current[key] = data;
+        setSlots(data);
+      })
+      .catch((err) => {
+        if (err.name !== "AbortError") setErr("Could not load slot list.");
+      })
+      .finally(() => setLS(false));
+  }, [courtId, date]);
 
-    fetchTimeSlots();
-  }, [selectedDate, selectedCourt]);
+  /* -------- helpers ----------------------------------------- */
+  const fmtLong = (iso: string) =>
+    new Date(iso).toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
-  /* --- helpers -------------------------------------------------- */
-  const formatDate = (iso: string) =>
-    iso
-      ? new Date(iso).toLocaleDateString("en-US", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
-      : "";
-
-  const availableDates = Array.from({ length: 7 }, (_, i) => {
+  const week = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() + i);
     return {
       value: d.toISOString().split("T")[0],
-      display: d.toLocaleDateString("en-US", {
+      label: d.toLocaleDateString("en-US", {
         weekday: "short",
         month: "short",
         day: "numeric",
@@ -112,177 +102,159 @@ export default function BookSlotsClient() {
     };
   });
 
-  const handleSlotClick = (slotId: string, time: string) => {
-    if (!selectedCourt) return;
-    const params = new URLSearchParams({
-      date: selectedDate,
-      courtId: selectedCourt.id,
-      courtName: selectedCourt.name,
-      courtType: selectedCourt.type,
-      price: selectedCourt.price.toString(),
-      slotId,
-      time,
+  const toggle = (s: Slot) =>
+    setSel((prev) =>
+      prev.find((p) => p.id === s.id)
+        ? prev.filter((p) => p.id !== s.id)
+        : [...prev, s]
+    );
+
+  const proceed = () => {
+    if (!court || selected.length === 0) return;
+    const p = new URLSearchParams({
+      date,
+      courtId,
+      courtName: court.name,
+      courtType: court.type,
+      price: (court.price * selected.length).toString(),
+      slotIds: selected.map((s) => s.id).join(","),
+      times: selected.map((s) => s.time).join(","),
     });
-    router.push(`/book?${params.toString()}`);
+    router.push(`/book?${p.toString()}`);
   };
 
-  /* --- render --------------------------------------------------- */
-  if (loading) {
+  /* ---------------- render ----------------------------------- */
+  if (error)
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <p className="bg-red-900/20 border border-red-700 rounded-lg px-6 py-4">
+          {error}
+        </p>
+      </div>
+    );
+
+  if (!court)
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="animate-pulse">Loading…</div>
       </div>
     );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="bg-red-900/20 border border-red-700 rounded-lg p-6 max-w-md text-center">
-          <h2 className="text-xl font-bold mb-2">Error</h2>
-          <p className="text-gray-300 mb-4">{error}</p>
-          <Link
-            href="/"
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors"
-          >
-            Return to Home
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  if (!selectedCourt) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <p className="mb-4">Court not found</p>
-          <Link
-            href="/"
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors"
-          >
-            Return to Home
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-black text-white pt-35 pb-16">
       <div className="container mx-auto px-4">
-        {/* back link */}
         <Link
           href="/"
           className="inline-flex items-center text-gray-300 hover:text-green-400 mb-6"
         >
-          <ArrowLeft size={16} className="mr-2" />
-          Back to Home
+          <ArrowLeft size={16} className="mr-2" /> Back to Home
         </Link>
 
-        {/* ----------------------------------------------------------------- */}
-        {/*  Court card + date picker                                         */}
-        {/* ----------------------------------------------------------------- */}
+        {/* card & date picker */}
         <div className="flex flex-col md:flex-row gap-8 mb-8">
-          {/* Court card */}
-          <div className="md:w-1/3">
-            <div
-              className="h-48 rounded-lg bg-cover bg-center relative overflow-hidden"
-              style={{ backgroundImage: `url(${selectedCourt.image})` }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent flex items-end p-6">
-                <div>
-                  <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">
-                    {selectedCourt.type}
-                  </span>
-                  <h1 className="text-white text-2xl font-bold mt-2">
-                    {selectedCourt.name}
-                  </h1>
-                  <p className="text-green-400 font-bold mt-1">
-                    ₹{selectedCourt.price}/hour
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Date picker */}
+          <CourtCard court={court} />
           <div className="md:w-2/3">
             <h2 className="text-2xl font-bold mb-4">
               Select a Date &amp; Time
             </h2>
-            <p className="text-gray-300 mb-6">
-              Choose from available time slots to book your court.
-            </p>
-
-            <div className="mb-8">
-              <label className="block text-white font-medium mb-2">Date</label>
-              <div className="flex overflow-x-auto pb-2">
-                {availableDates.map((d) => (
-                  <button
-                    key={d.value}
-                    type="button"
-                    className={`p-3 border rounded-lg text-center transition-colors whitespace-nowrap mr-2 ${
-                      selectedDate === d.value
-                        ? "bg-green-600 text-white border-green-600"
-                        : "border-gray-700 hover:border-green-600 text-gray-300"
+            <p className="text-gray-300 mb-6">Choose the slot(s) you want.</p>
+            <label className="block mb-2 text-white font-medium">Date</label>
+            <div className="flex overflow-x-auto pb-2">
+              {week.map((d) => (
+                <button
+                  key={d.value}
+                  onClick={() => setDate(d.value)}
+                  className={`p-3 border rounded-lg mr-2 whitespace-nowrap
+                    ${
+                      d.value === date
+                        ? "bg-green-600 border-green-600 text-white"
+                        : "border-gray-700 hover:border-green-500 text-gray-300"
                     }`}
-                    onClick={() => setSelectedDate(d.value)}
-                  >
-                    {d.display}
-                  </button>
-                ))}
-              </div>
+                >
+                  {d.label}
+                </button>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* ----------------------------------------------------------------- */}
-        {/*  Time-slots grid                                                  */}
-        {/* ----------------------------------------------------------------- */}
+        {/* slot grid */}
         <div className="bg-gray-900 rounded-lg p-6 border-2 border-green-800">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold">
-              Available Time Slots for {formatDate(selectedDate)}
-            </h3>
-            <div className="text-sm text-gray-300 flex items-center">
-              <Clock size={16} className="mr-2" />
-              Operating Hours: 6 AM – 11 PM
-            </div>
+            <h3 className="text-xl font-bold">Slots • {fmtLong(date)}</h3>
+            <span className="text-sm text-gray-300 flex items-center">
+              <Clock size={16} className="mr-2" /> 6 AM – 11 PM
+            </span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {timeSlots.map((slot) => (
-              <motion.div
-                key={slot.id}
-                whileHover={{ scale: slot.available ? 1.05 : 1 }}
-                whileTap={{ scale: slot.available ? 0.95 : 1 }}
-                className={`p-4 rounded-lg text-center cursor-pointer border ${
-                  slot.available
-                    ? "border-green-600 bg-green-900/40 hover:bg-green-800"
-                    : "border-gray-700 bg-gray-800 opacity-50 cursor-not-allowed"
-                }`}
-                onClick={() =>
-                  slot.available && handleSlotClick(slot.id, slot.time)
-                }
-              >
-                <p className="font-medium">{slot.time}</p>
-                <p className="text-sm mt-1 text-gray-400">
-                  {slot.available ? "Available" : "Booked"}
-                </p>
-              </motion.div>
-            ))}
+            {loadingSlots
+              ? Array.from({ length: 15 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-14 rounded-lg bg-gray-800 animate-pulse"
+                  />
+                ))
+              : slots.map((s) => {
+                  const act = selected.some((sel) => sel.id === s.id);
+                  return (
+                    <motion.div
+                      key={s.id}
+                      onClick={() => s.available && toggle(s)}
+                      whileHover={{ scale: s.available ? 1.05 : 1 }}
+                      whileTap={{ scale: s.available ? 0.95 : 1 }}
+                      className={`p-4 rounded-lg text-center cursor-pointer border
+                        ${
+                          !s.available
+                            ? "border-gray-700 bg-gray-800 opacity-50 cursor-not-allowed"
+                            : act
+                            ? "bg-green-600 border-green-600 text-white"
+                            : "border-green-600 bg-green-900/40 hover:bg-green-800"
+                        }`}
+                    >
+                      {s.time}
+                    </motion.div>
+                  );
+                })}
           </div>
 
-          <div className="mt-6 text-sm text-gray-300 bg-gray-800 p-4 rounded-lg">
-            <p className="flex items-center">
-              <span className="bg-green-900/40 border border-green-600 w-4 h-4 rounded mr-2" />
-              Available slots can be booked instantly
+          {/* footer */}
+          <div className="mt-6 flex justify-between items-center">
+            <p className="text-sm">
+              Selected <b>{selected.length}</b> slot(s) • Total&nbsp;
+              <span className="text-green-400 font-semibold">
+                ₹{court.price * selected.length}
+              </span>
             </p>
-            <p className="flex items-center mt-2">
-              <span className="bg-gray-800 border border-gray-700 w-4 h-4 rounded mr-2" />
-              Unavailable slots are already booked
-            </p>
+            <button
+              onClick={proceed}
+              disabled={selected.length === 0}
+              className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg disabled:opacity-50"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------ sub-component for court card ------------------- */
+function CourtCard({ court }: { court: Court }) {
+  return (
+    <div className="md:w-1/3">
+      <div
+        className="h-48 rounded-lg bg-cover bg-center relative overflow-hidden"
+        style={{ backgroundImage: `url(${court.image})` }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent p-6 flex items-end">
+          <div>
+            <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">
+              {court.type}
+            </span>
+            <h1 className="text-2xl font-bold mt-2">{court.name}</h1>
+            <p className="text-green-400 font-bold mt-1">₹{court.price}/hour</p>
           </div>
         </div>
       </div>
