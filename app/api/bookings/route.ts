@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/app/lib/db";
 import Booking from "@/app/lib/models/Bookings";
 
-/* ─────────────────────────  POST  /api/bookings  ───────────────────────── */
 export async function POST(req: NextRequest) {
   try {
     await connectToDatabase();
@@ -13,17 +12,17 @@ export async function POST(req: NextRequest) {
       courtId,
       courtName,
       courtType,
-      date, // "YYYY-MM-DD"
+      date, // plain "YYYY-MM-DD"
       slotIds, // string[]
       times, // string[]
-      price, // number (total)
+      price, // number
       name,
       email,
       phone,
-      paymentMethod, // 'card' | 'cash'
+      paymentMethod,
     } = body;
 
-    /* ---- light validation ------------------------------------ */
+    // --- validation ---
     if (
       !courtId ||
       !courtName ||
@@ -33,18 +32,18 @@ export async function POST(req: NextRequest) {
       slotIds.length === 0 ||
       !Array.isArray(times) ||
       times.length !== slotIds.length ||
-      price === undefined ||
+      typeof price !== "number" ||
       !name ||
       !phone ||
-      !paymentMethod
+      (paymentMethod !== "card" && paymentMethod !== "cash")
     ) {
       return NextResponse.json(
-        { error: "Missing or invalid fields" },
+        { error: "Missing or invalid booking fields" },
         { status: 400 }
       );
     }
 
-    /* ---- clash check: ANY of the requested slotIds already booked? ---- */
+    // --- clash check ---
     const clash = await Booking.findOne({
       courtId,
       date,
@@ -53,12 +52,12 @@ export async function POST(req: NextRequest) {
     });
     if (clash) {
       return NextResponse.json(
-        { error: "Some slot is already booked" },
+        { error: "One or more of those slots is already booked" },
         { status: 409 }
       );
     }
 
-    /* ---- create booking -------------------------------------- */
+    // --- create ---
     const booking = await Booking.create({
       courtId,
       courtName,
@@ -81,19 +80,25 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/* ─────────────────────────  GET  /api/bookings  ───────────────────────── */
-/*     • /api/bookings?id=<bookingId>                                      */
-/*     • /api/bookings?email=user@example.com                              */
-export async function GET(request: NextRequest) {
+/**
+ * GET /api/bookings?id=<bookingId>
+ * GET /api/bookings?email=<userEmail>
+ */
+export async function GET(req: NextRequest) {
   try {
     await connectToDatabase();
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     const email = searchParams.get("email");
 
     if (id) {
       const b = await Booking.findById(id);
-      if (!b) return NextResponse.json({ error: "Not found" }, { status: 404 });
+      if (!b) {
+        return NextResponse.json(
+          { error: "Booking not found" },
+          { status: 404 }
+        );
+      }
       return NextResponse.json(b);
     }
 
@@ -103,7 +108,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: "Email or ID required" },
+      { error: "Either `id` or `email` query param is required" },
       { status: 400 }
     );
   } catch (err) {

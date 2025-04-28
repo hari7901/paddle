@@ -1,4 +1,4 @@
-/* app/book-slots/BookSlotsClient.tsx */
+// app/book-slots/BookSlotsClient.tsx
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -17,25 +17,38 @@ type Court = {
   image: string;
 };
 
+/** Return YYYY-MM-DD for the given Date in *local* time */
+function getLocalISO(date: Date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+/** Format YYYY-MM-DD into a more human friendly string */
+function formatLocalDate(iso: string) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-US");
+}
+
 export default function BookSlotsClient() {
   const sp = useSearchParams();
   const router = useRouter();
 
   const courtId = sp.get("courtId") || "";
-  const today = new Date().toISOString().split("T")[0];
+  const todayISO = getLocalISO(new Date());
 
-  const [date, setDate] = useState(today);
+  const [date, setDate] = useState<string>(todayISO);
   const [court, setCourt] = useState<Court | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selected, setSelected] = useState<Slot[]>([]);
   const [err, setErr] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  /* tiny in-memory cache */
   const cache = useRef<Record<string, Slot[]>>({});
   const abortRef = useRef<AbortController | null>(null);
 
-  /* fetch court once ------------------------------------------ */
+  /* Fetch court info once */
   useEffect(() => {
     if (!courtId) {
       router.push("/");
@@ -47,7 +60,7 @@ export default function BookSlotsClient() {
       .catch(() => setErr("Could not load court."));
   }, [courtId, router]);
 
-  /* fetch slots on date change -------------------------------- */
+  /* Fetch slots whenever “date” changes */
   useEffect(() => {
     if (!courtId) return;
     const key = `${date}|${courtId}`;
@@ -63,7 +76,9 @@ export default function BookSlotsClient() {
     abortRef.current = ctrl;
 
     setLoading(true);
-    fetch(`/api/slots?courtId=${courtId}&date=${date}`, { signal: ctrl.signal })
+    fetch(`/api/slots?courtId=${courtId}&date=${date}`, {
+      signal: ctrl.signal,
+    })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((data: Slot[]) => {
         cache.current[key] = data;
@@ -76,15 +91,18 @@ export default function BookSlotsClient() {
       .finally(() => setLoading(false));
   }, [courtId, date]);
 
-  /* helpers --------------------------------------------------- */
+  /* Toggle slot selection */
   const toggle = (s: Slot) =>
-    setSelected((p) =>
-      p.find((x) => x.id === s.id) ? p.filter((x) => x.id !== s.id) : [...p, s]
+    setSelected((prev) =>
+      prev.find((x) => x.id === s.id)
+        ? prev.filter((x) => x.id !== s.id)
+        : [...prev, s]
     );
 
+  /* Proceed to booking page */
   const proceed = () => {
     if (!court || !selected.length) return;
-    const p = new URLSearchParams({
+    const params = new URLSearchParams({
       date,
       courtId,
       courtName: court.name,
@@ -93,14 +111,15 @@ export default function BookSlotsClient() {
       slotIds: selected.map((s) => s.id).join(","),
       times: selected.map((s) => s.time).join(","),
     });
-    router.push(`/book?${p.toString()}`);
+    router.push(`/book?${params.toString()}`);
   };
 
+  /* Build next 7 local dates for the picker */
   const week = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() + i);
     return {
-      value: d.toISOString().split("T")[0],
+      value: getLocalISO(d),
       label: d.toLocaleDateString("en-US", {
         weekday: "short",
         month: "short",
@@ -109,7 +128,6 @@ export default function BookSlotsClient() {
     };
   });
 
-  /* ----------- render ---------------------------------------- */
   if (err) return <FullScreen text={err} />;
   if (!court) return <FullScreen text="Loading…" spinner />;
 
@@ -123,7 +141,7 @@ export default function BookSlotsClient() {
           <ArrowLeft size={16} className="mr-2" /> Back to Home
         </Link>
 
-        {/* court card & dates */}
+        {/* Court info + Date picker */}
         <div className="flex flex-col md:flex-row gap-8 mb-8">
           <CourtCard court={court} />
           <div className="md:w-2/3">
@@ -137,12 +155,11 @@ export default function BookSlotsClient() {
                 <button
                   key={d.value}
                   onClick={() => setDate(d.value)}
-                  className={`p-3 border rounded-lg mr-2 whitespace-nowrap
-                    ${
-                      d.value === date
-                        ? "bg-green-600 border-green-600 text-white"
-                        : "border-gray-700 hover:border-green-500 text-gray-300"
-                    }`}
+                  className={`p-3 border rounded-lg mr-2 whitespace-nowrap ${
+                    d.value === date
+                      ? "bg-green-600 border-green-600 text-white"
+                      : "border-gray-700 hover:border-green-500 text-gray-300"
+                  }`}
                 >
                   {d.label}
                 </button>
@@ -151,11 +168,11 @@ export default function BookSlotsClient() {
           </div>
         </div>
 
-        {/* slot grid */}
+        {/* Slots grid */}
         <div className="bg-gray-900 rounded-lg p-6 border-2 border-green-800">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-bold">
-              Slots • {new Date(date).toLocaleDateString()}
+              Slots • {formatLocalDate(date)}
             </h3>
             <span className="text-sm text-gray-300 flex items-center">
               <Clock size={16} className="mr-2" /> 6 AM – 11 PM
@@ -175,17 +192,17 @@ export default function BookSlotsClient() {
                   const base =
                     "p-4 rounded-lg text-center border h-16 flex flex-col justify-center";
 
-                  if (!s.available)
+                  if (!s.available) {
                     return (
                       <div
                         key={s.id}
-                        className={`${base} border-red-700 bg-red-900/40 text-red-300
-                                     cursor-default pointer-events-none`}
+                        className={`${base} border-red-700 bg-red-900/40 text-red-300 cursor-default pointer-events-none`}
                       >
                         <span>{s.time}</span>
                         <span className="text-xs mt-0.5">Booked</span>
                       </div>
                     );
+                  }
 
                   return (
                     <motion.div
@@ -193,12 +210,11 @@ export default function BookSlotsClient() {
                       onClick={() => toggle(s)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`${base} cursor-pointer
-                        ${
-                          isSel
-                            ? "bg-green-600 border-green-600 text-white"
-                            : "bg-green-900/40 border-green-600 hover:bg-green-800"
-                        }`}
+                      className={`${base} cursor-pointer ${
+                        isSel
+                          ? "bg-green-600 border-green-600 text-white"
+                          : "bg-green-900/40 border-green-600 hover:bg-green-800"
+                      }`}
                     >
                       {s.time}
                     </motion.div>
@@ -206,7 +222,7 @@ export default function BookSlotsClient() {
                 })}
           </div>
 
-          {/* footer */}
+          {/* Footer */}
           <div className="mt-6 flex justify-between items-center">
             <p className="text-sm">
               Selected <b>{selected.length}</b> • Total&nbsp;
@@ -228,7 +244,6 @@ export default function BookSlotsClient() {
   );
 }
 
-/* ---------- helpers ---------- */
 function CourtCard({ court }: { court: Court }) {
   return (
     <div className="md:w-1/3">

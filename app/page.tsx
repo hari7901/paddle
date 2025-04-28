@@ -7,7 +7,8 @@ import HeroSection from "@/app/components/HeroSection";
 import BookingSection from "@/app/components/BookingSection";
 import AboutSection from "@/app/components/AboutSection";
 import ContactSection from "@/app/components/ContactSection";
-import AddressSection from "@/app/components/AddressSection";
+import AddressSection from "@/app/components/Footer";
+import AddressMapSection from "./components/AddressMapSection";
 
 // Animation variants
 const fadeIn = {
@@ -41,16 +42,16 @@ export default function Home() {
         <BookingSection />
       </section>
 
+      <section id="adress" data-aos="fade-up">
+        <AddressMapSection />
+      </section>
+
       <section id="about" data-aos="fade-up">
         <AboutSection />
       </section>
 
       <section id="contact" data-aos="fade-up">
         <ContactSection />
-      </section>
-
-      <section id="address" data-aos="fade-up">
-        <AddressSection />
       </section>
     </main>
   );

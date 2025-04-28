@@ -126,50 +126,7 @@ const BookingSection = () => {
           ))}
         </motion.div>
 
-        {/* features */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          viewport={{ once: true }}
-          className="bg-gradient-to-br from-gray-900 to-black p-8 rounded-2xl border border-gray-800 max-w-5xl mx-auto shadow-lg"
-        >
-          <h3 className="text-2xl font-bold mb-8 text-center">
-            Why Book With Us
-          </h3>
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* item 1 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-green-900/30 flex items-center justify-center mb-4">
-                <Calendar className="h-8 w-8 text-green-400" />
-              </div>
-              <h4 className="text-lg font-bold mb-2">Flexible Booking</h4>
-              <p className="text-gray-400">
-                Book your slot anytime from 6:00 AM to 11:00 PM, 7 days a week.
-              </p>
-            </div>
-            {/* item 2 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-green-900/30 flex items-center justify-center mb-4">
-                <Shield className="h-8 w-8 text-green-400" />
-              </div>
-              <h4 className="text-lg font-bold mb-2">Secure Payments</h4>
-              <p className="text-gray-400">
-                Easily pay online or at the venue with our secure system.
-              </p>
-            </div>
-            {/* item 3 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-green-900/30 flex items-center justify-center mb-4">
-                <Award className="h-8 w-8 text-green-400" />
-              </div>
-              <h4 className="text-lg font-bold mb-2">Premium Facilities</h4>
-              <p className="text-gray-400">
-                Experience professional-grade courts with exceptional surfaces.
-              </p>
-            </div>
-          </div>
-        </motion.div>
+        
       </div>
     </div>
   );

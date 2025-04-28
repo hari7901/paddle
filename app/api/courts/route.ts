@@ -1,20 +1,19 @@
 // app/api/courts/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-// Sample court data - only two courts
 const courts = [
   {
     id: "court-1",
     name: "Singles Court",
     type: "Singles",
-    price: 800,
+    price: 1200,
     image: "/paddle3.jpg",
   },
   {
     id: "court-2",
     name: "Doubles Court",
     type: "Doubles",
-    price: 1200,
+    price: 1600,
     image: "/paddle4.jpg",
   },
 ];

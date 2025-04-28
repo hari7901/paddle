@@ -1,7 +1,24 @@
 // app/lib/models/Bookings.ts
-import { Schema, models, model } from "mongoose";
+import { Schema, models, model, Document } from "mongoose";
 
-const BookingSchema = new Schema(
+export interface IBooking extends Document {
+  courtId: string;
+  courtName: string;
+  courtType: string;
+  price: number;
+  date: string; // "YYYY-MM-DD"
+  slotIds: string[]; // one or more slot IDs
+  times: string[]; // matching array of time strings
+  name: string;
+  email: string;
+  phone: string;
+  paymentMethod: "card" | "cash";
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const BookingSchema = new Schema<IBooking>(
   {
     /* ─── court info ─── */
     courtId: { type: String, required: true },
@@ -11,8 +28,8 @@ const BookingSchema = new Schema(
 
     /* ─── when & what ─── */
     date: { type: String, required: true }, // e.g. "2025-04-27"
-    slotIds: { type: [String], required: true }, // e.g. ["605c...", "605c..."]
-    times: { type: [String], required: true }, // e.g. ["20:00–21:00", ...]
+    slotIds: { type: [String], required: true }, // e.g. ["slot-8","slot-9"]
+    times: { type: [String], required: true }, // e.g. ["13:00–14:00","14:00–15:00"]
 
     /* ─── user ─── */
     name: { type: String, required: true },
@@ -20,15 +37,13 @@ const BookingSchema = new Schema(
     phone: { type: String, required: true },
     paymentMethod: { type: String, enum: ["card", "cash"], required: true },
 
-    /* ─── status & audit ─── */
+    /* ─── status ─── */
     status: { type: String, default: "CONFIRMED" },
   },
   { timestamps: true }
 );
 
-/* ─── remove any old slotId-based unique index ───  
-   we enforce per-slot clash in the API route, not via Mongo  
-*/
-BookingSchema.index({ courtId: 1, date: 1 }); // non-unique for lookups
+/* index on courtId+date for fast lookups (non-unique) */
+BookingSchema.index({ courtId: 1, date: 1 });
 
-export default models.Booking || model("Booking", BookingSchema);
+export default models.Booking || model<IBooking>("Booking", BookingSchema);

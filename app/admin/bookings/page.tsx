@@ -1,3 +1,4 @@
+// app/admin/bookings/page.tsx
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
@@ -38,7 +39,8 @@ export default function AdminBookings() {
 
   /* search + filters */
   const [q, setQ] = useState("");
-  const [filterDate, setDate] = useState("");
+  const todayStr = format(new Date(), "yyyy-MM-dd");
+  const [filterDate, setDate] = useState(todayStr);
   const [filterCourt, setCourt] = useState("All");
   const [filterTime, setTime] = useState("All");
 
@@ -100,15 +102,27 @@ export default function AdminBookings() {
 
   const filtered = useMemo(() => {
     return bookings.filter((b) => {
+      // normalize booking date to YYYY-MM-DD
+      const bookingDate = b.date.includes("T") ? b.date.split("T")[0] : b.date;
+
       const txt = q.trim().toLowerCase();
       const matchTxt =
         !txt || b.name.toLowerCase().includes(txt) || b.phone.includes(txt);
-      const matchDate = !filterDate || b.date === filterDate;
+      const matchDate = !filterDate || bookingDate === filterDate;
       const matchCourt = filterCourt === "All" || b.courtType === filterCourt;
       const matchTime = filterTime === "All" || b.times.includes(filterTime);
+
       return matchTxt && matchDate && matchCourt && matchTime;
     });
   }, [bookings, q, filterDate, filterCourt, filterTime]);
+
+  /* ---------- stats ---------- */
+  const countFiltered = filtered.length;
+  const earningsFiltered = filtered.reduce((sum, b) => sum + b.price, 0);
+  const earningsAll = useMemo(
+    () => bookings.reduce((sum, b) => sum + b.price, 0),
+    [bookings]
+  );
 
   /* ---------- UI ---------- */
   if (error)
@@ -130,21 +144,37 @@ export default function AdminBookings() {
       {/* header */}
       <div className="flex items-center justify-between mb-4 md:mb-6">
         <h1 className="text-3xl font-bold">Bookings</h1>
-
         <div className="flex gap-2">
           <Link
             href="/admin/new-booking"
             className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-1"
           >
-            <span className="text-xl leading-none">＋</span> New&nbsp;Booking
+            <span className="text-xl leading-none">＋</span> New Booking
           </Link>
-
           <button
             onClick={logout}
             className="bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm px-3 py-2 rounded-lg flex items-center gap-1"
           >
-            <LogOut size={16} /> Log&nbsp;out
+            <LogOut size={16} /> Log out
           </button>
+        </div>
+      </div>
+
+      {/* statistics */}
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <p className="text-sm text-gray-400">Bookings</p>
+          <p className="text-2xl font-bold">{countFiltered}</p>
+        </div>
+        <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <p className="text-sm text-gray-400">Earnings</p>
+          <p className="text-2xl font-bold text-green-400">
+            ₹{earningsFiltered}
+          </p>
+        </div>
+        <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <p className="text-sm text-gray-400">Total Earnings</p>
+          <p className="text-2xl font-bold text-green-400">₹{earningsAll}</p>
         </div>
       </div>
 
@@ -174,11 +204,22 @@ export default function AdminBookings() {
           <span className="font-medium">Filters:</span>
         </div>
 
+        <label className="flex items-center gap-1 text-sm">
+          <input
+            type="checkbox"
+            checked={!filterDate}
+            onChange={() => setDate("")}
+            className="accent-green-500"
+          />
+          All dates
+        </label>
+
         <input
           type="date"
           value={filterDate}
           onChange={(e) => setDate(e.target.value)}
-          className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
+          disabled={!filterDate}
+          className="bg-gray-800 disabled:bg-gray-700 border border-gray-700 disabled:border-gray-600 rounded-lg px-3 py-1.5 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
         />
 
         <select
@@ -203,21 +244,19 @@ export default function AdminBookings() {
           ))}
         </select>
 
-        {(filterDate || filterTime !== "All" || filterCourt !== "All") && (
-          <button
-            onClick={() => {
-              setDate("");
-              setTime("All");
-              setCourt("All");
-            }}
-            className="ml-auto text-sm text-red-400 hover:text-red-300"
-          >
-            Clear
-          </button>
-        )}
+        <button
+          onClick={() => {
+            setDate(todayStr);
+            setTime("All");
+            setCourt("All");
+          }}
+          className="ml-auto text-sm text-red-400 hover:text-red-300"
+        >
+          Reset
+        </button>
       </div>
 
-      {/* ───── TABLE (desktop) ───── */}
+      {/* ───────── TABLE (desktop) ───────── */}
       <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full border-collapse text-sm">
           <thead className="bg-gray-900 text-gray-300">
@@ -278,7 +317,7 @@ export default function AdminBookings() {
         )}
       </div>
 
-      {/* ───── CARDS (mobile) ───── */}
+      {/* ───────── CARDS (mobile) ───────── */}
       <div className="md:hidden space-y-4">
         {filtered.map((b) => (
           <div
@@ -295,31 +334,25 @@ export default function AdminBookings() {
                 <Trash2 size={18} />
               </button>
             </div>
-
             <p className="text-sm mt-1">
               <b>{b.courtName}</b> ({b.courtType})
             </p>
-
             <p className="text-sm mt-1">
               {b.date} • {b.times.join(", ")}
             </p>
-
             <p className="text-sm mt-1">{b.name}</p>
             <p className="text-xs text-gray-400">{b.phone}</p>
-
             <p className="text-sm mt-1">
-              Payment:&nbsp;
+              Payment:{" "}
               <span className="font-medium text-gray-200">
                 {b.paymentMethod === "card" ? "Card" : "Pay on site"}
               </span>
             </p>
-
             <p className="text-sm text-green-400 font-semibold mt-1">
               ₹{b.price}
             </p>
           </div>
         ))}
-
         {!filtered.length && !loading && (
           <p className="text-center text-gray-400 mt-6">No bookings found.</p>
         )}
@@ -331,8 +364,8 @@ export default function AdminBookings() {
 /* ---------- tiny TD / TH helpers ---------- */
 function TH(props: {
   children: React.ReactNode;
-  className?: string;
   align?: string;
+  className?: string;
 }) {
   return (
     <th
@@ -344,9 +377,9 @@ function TH(props: {
     </th>
   );
 }
-function TD(props: { children: React.ReactNode; align?: string; className?: string }) {
+function TD(props: { children: React.ReactNode; align?: string }) {
   return (
-    <td className={`px-4 py-3 ${props.align ? `text-${props.align}` : ""} ${props.className ?? ""}`}>
+    <td className={`px-4 py-3 ${props.align ? `text-${props.align}` : ""}`}>
       {props.children}
     </td>
   );
