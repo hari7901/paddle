@@ -2,6 +2,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/app/lib/db";
 import Booking from "@/app/lib/models/Bookings";
+import MailchimpTransactional from "@mailchimp/mailchimp_transactional";
+
+const mc = MailchimpTransactional(process.env.MC_TRANSACTIONAL_API_KEY!);
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,17 +16,17 @@ export async function POST(req: NextRequest) {
       courtId,
       courtName,
       courtType,
-      date, // plain "YYYY-MM-DD"
+      date, // "YYYY-MM-DD"
       slotIds, // string[]
       times, // string[]
-      price, // number
+      price, // number (total)
       name,
       email,
       phone,
-      paymentMethod,
+      paymentMethod, // 'card' | 'cash'
     } = body;
 
-    // --- validation ---
+    // basic validation
     if (
       !courtId ||
       !courtName ||
@@ -32,18 +36,18 @@ export async function POST(req: NextRequest) {
       slotIds.length === 0 ||
       !Array.isArray(times) ||
       times.length !== slotIds.length ||
-      typeof price !== "number" ||
+      price === undefined ||
       !name ||
       !phone ||
-      (paymentMethod !== "card" && paymentMethod !== "cash")
+      !paymentMethod
     ) {
       return NextResponse.json(
-        { error: "Missing or invalid booking fields" },
+        { error: "Missing or invalid fields" },
         { status: 400 }
       );
     }
 
-    // --- clash check ---
+    // clash check
     const clash = await Booking.findOne({
       courtId,
       date,
@@ -52,12 +56,12 @@ export async function POST(req: NextRequest) {
     });
     if (clash) {
       return NextResponse.json(
-        { error: "One or more of those slots is already booked" },
+        { error: "Some slot is already booked" },
         { status: 409 }
       );
     }
 
-    // --- create ---
+    // create booking
     const booking = await Booking.create({
       courtId,
       courtName,
@@ -73,6 +77,36 @@ export async function POST(req: NextRequest) {
       status: "CONFIRMED",
     });
 
+    // ── send simple Mailchimp transactional email to admin ──
+    await mc.messages.send({
+      message: {
+        from_email: process.env.MAIL_FROM!,
+        subject: `New booking: ${courtName} on ${date}`,
+        text: `
+A new booking was made:
+
+• Court: ${courtName} (${courtType})
+• Date:  ${date}
+• Time:  ${times.join(", ")}
+• Slots: ${slotIds.join(", ")}
+• Total: ₹${price}
+
+Customer:
+  Name:  ${name}
+  Email: ${email}
+  Phone: ${phone}
+
+Thank you!
+        `.trim(),
+        to: [
+          {
+            email: process.env.ADMIN_EMAIL!,
+            type: "to",
+          },
+        ],
+      },
+    });
+
     return NextResponse.json({ success: true, data: booking }, { status: 201 });
   } catch (err) {
     console.error("Booking POST error:", err);
@@ -80,10 +114,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/**
- * GET /api/bookings?id=<bookingId>
- * GET /api/bookings?email=<userEmail>
- */
 export async function GET(req: NextRequest) {
   try {
     await connectToDatabase();

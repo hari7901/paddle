@@ -1,4 +1,3 @@
-// app/admin/bookings/page.tsx
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
@@ -361,26 +360,32 @@ export default function AdminBookings() {
   );
 }
 
-/* ---------- tiny TD / TH helpers ---------- */
-function TH(props: {
-  children: React.ReactNode;
-  align?: string;
-  className?: string;
-}) {
+/* ---------- TH / TD helpers with correct typing ---------- */
+import React from "react";
+
+interface THProps extends React.ThHTMLAttributes<HTMLTableHeaderCellElement> {
+  align?: "left" | "center" | "right";
+}
+function TH({ children, align, className, ...rest }: THProps) {
+  const alignClass = align ? `text-${align}` : "";
   return (
     <th
-      className={`px-4 py-3 text-left ${
-        props.align ? `text-${props.align}` : ""
-      } ${props.className ?? ""}`}
+      className={`px-4 py-3 text-left ${alignClass} ${className || ""}`}
+      {...rest}
     >
-      {props.children}
+      {children}
     </th>
   );
 }
-function TD(props: { children: React.ReactNode; align?: string }) {
+
+interface TDProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
+  align?: "left" | "center" | "right";
+}
+function TD({ children, align, className, ...rest }: TDProps) {
+  const alignClass = align ? `text-${align}` : "";
   return (
-    <td className={`px-4 py-3 ${props.align ? `text-${props.align}` : ""}`}>
-      {props.children}
+    <td className={`px-4 py-3 ${alignClass} ${className || ""}`} {...rest}>
+      {children}
     </td>
   );
 }
