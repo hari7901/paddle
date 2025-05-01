@@ -20,8 +20,17 @@
     ],
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    // ← Add typeRoots so TypeScript picks up your custom declarations
+    "typeRoots": ["types", "node_modules/@types"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    // ← Include your custom .d.ts files
+    "types/**/*.d.ts"
+  ],
   "exclude": ["node_modules"]
 }

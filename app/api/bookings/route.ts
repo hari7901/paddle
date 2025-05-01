@@ -1,32 +1,29 @@
-// app/api/bookings/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/app/lib/db";
 import Booking from "@/app/lib/models/Bookings";
-import MailchimpTransactional from "@mailchimp/mailchimp_transactional";
-
-const mc = MailchimpTransactional(process.env.MC_TRANSACTIONAL_API_KEY!);
-
+import {
+  sendAdminNotification,
+  sendCustomerConfirmation,
+} from "@/app/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
     await connectToDatabase();
-    const body = await req.json();
-
     const {
       courtId,
       courtName,
       courtType,
-      date, // "YYYY-MM-DD"
-      slotIds, // string[]
-      times, // string[]
-      price, // number (total)
+      date,
+      slotIds,
+      times,
+      price,
       name,
       email,
       phone,
-      paymentMethod, // 'card' | 'cash'
-    } = body;
+      paymentMethod,
+    } = await req.json();
 
-    // basic validation
+    // ── validation ──
     if (
       !courtId ||
       !courtName ||
@@ -38,6 +35,7 @@ export async function POST(req: NextRequest) {
       times.length !== slotIds.length ||
       price === undefined ||
       !name ||
+      !email ||
       !phone ||
       !paymentMethod
     ) {
@@ -47,7 +45,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // clash check
+    // ── clash check ──
     const clash = await Booking.findOne({
       courtId,
       date,
@@ -61,7 +59,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // create booking
+    // ── create booking ──
     const booking = await Booking.create({
       courtId,
       courtName,
@@ -77,35 +75,22 @@ export async function POST(req: NextRequest) {
       status: "CONFIRMED",
     });
 
-    // ── send simple Mailchimp transactional email to admin ──
-    await mc.messages.send({
-      message: {
-        from_email: process.env.MAIL_FROM!,
-        subject: `New booking: ${courtName} on ${date}`,
-        text: `
-A new booking was made:
+    // ── send emails ──
+    const params = {
+      bookingId: booking._id.toString(),
+      courtName,
+      courtType,
+      date,
+      times,
+      slotIds,
+      price,
+      name,
+      email,
+      phone,
+    };
 
-• Court: ${courtName} (${courtType})
-• Date:  ${date}
-• Time:  ${times.join(", ")}
-• Slots: ${slotIds.join(", ")}
-• Total: ₹${price}
-
-Customer:
-  Name:  ${name}
-  Email: ${email}
-  Phone: ${phone}
-
-Thank you!
-        `.trim(),
-        to: [
-          {
-            email: process.env.ADMIN_EMAIL!,
-            type: "to",
-          },
-        ],
-      },
-    });
+    await sendAdminNotification(params);
+    await sendCustomerConfirmation(params);
 
     return NextResponse.json({ success: true, data: booking }, { status: 201 });
   } catch (err) {
@@ -119,21 +104,22 @@ export async function GET(req: NextRequest) {
     await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    const email = searchParams.get("email");
+    const emailQ = searchParams.get("email");
 
     if (id) {
       const b = await Booking.findById(id);
-      if (!b) {
+      if (!b)
         return NextResponse.json(
           { error: "Booking not found" },
           { status: 404 }
         );
-      }
       return NextResponse.json(b);
     }
 
-    if (email) {
-      const list = await Booking.find({ email }).sort({ createdAt: -1 });
+    if (emailQ) {
+      const list = await Booking.find({ email: emailQ }).sort({
+        createdAt: -1,
+      });
       return NextResponse.json(list);
     }
 

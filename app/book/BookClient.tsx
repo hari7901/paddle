@@ -26,8 +26,6 @@ export default function BookClient() {
   const courtName = sp.get("courtName") || "";
   const courtType = sp.get("courtType") || "";
   const price = sp.get("price") || "";
-
-  /*  NEW: multiple slots  */
   const slotIds = (sp.get("slotIds") || "").split(",").filter(Boolean);
   const times = (sp.get("times") || "").split(",").filter(Boolean);
 
@@ -35,13 +33,21 @@ export default function BookClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
   const [bookingRef, setBookingRef] = useState("");
+  const [userEmail, setUserEmail] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: "",
+    localNumber: "",
     paymentMethod: "card" as "card" | "cash",
     agreeToTerms: false,
+  });
+
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    agreeToTerms: "",
   });
 
   /* ------------ helpers ---------------------------------------- */
@@ -53,10 +59,41 @@ export default function BookClient() {
       day: "numeric",
     });
 
+  const validate = () => {
+    const errs = { name: "", email: "", phone: "", agreeToTerms: "" };
+
+    // Name validation
+    if (!formData.name.trim()) {
+      errs.name = "Name is required.";
+    } else if (!/^[A-Za-z ]{3,}$/.test(formData.name.trim())) {
+      errs.name = "Enter a valid name (min 3 letters).";
+    }
+
+    // Email validation (must end @gmail.com)
+    if (!formData.email.trim()) {
+      errs.email = "Email is required.";
+    } else if (!/^[^\s@]+@gmail\.com$/.test(formData.email.trim())) {
+      errs.email = "Enter a valid @gmail.com address.";
+    }
+
+    // Phone validation (10-digit local number)
+    if (!/^[6-9]\d{9}$/.test(formData.localNumber)) {
+      errs.phone = "Enter a valid 10-digit Indian mobile number.";
+    }
+
+    // Terms checkbox
+    if (!formData.agreeToTerms) {
+      errs.agreeToTerms = "You must accept the terms.";
+    }
+
+    setErrors(errs);
+    return !Object.values(errs).some(Boolean);
+  };
+
   const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setFormData((p) => ({
-      ...p,
+    setFormData((prev) => ({
+      ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
@@ -64,17 +101,11 @@ export default function BookClient() {
   /* ------------ submit handler --------------------------------- */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (
-      !formData.name ||
-      !formData.email ||
-      !formData.phone ||
-      !formData.agreeToTerms
-    ) {
-      alert("Fill all fields and accept the terms.");
-      return;
-    }
+    if (!validate()) return;
+
     setIsSubmitting(true);
     try {
+      const phone = "+91" + formData.localNumber;
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -86,15 +117,16 @@ export default function BookClient() {
           date,
           slotIds,
           times,
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone,
           paymentMethod: formData.paymentMethod,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to create booking");
       setBookingRef(data.data._id);
+      setUserEmail(formData.email.trim());
       setBookingComplete(true);
     } catch {
       alert("Could not complete booking — slot may be taken.");
@@ -108,66 +140,40 @@ export default function BookClient() {
     if (!date || !courtId || slotIds.length === 0) router.push("/");
   }, [date, courtId, slotIds, router]);
 
+  /* ------------ booking complete view -------------------------- */
   if (bookingComplete)
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#2E3D5A] to-[#5A8FC8] text-white pt-35 pb-16">
+      <div className="min-h-screen bg-gradient-to-br from-[#2E3D5A] to-[#5A8FC8] text-white pt-40 pb-16">
         <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto bg-gradient-to-br from-[#191A24] to-[#4D789D] rounded-lg p-8 border-2 border-[#4D789D]">
-            <div className="text-center mb-8">
+          <div className="max-w-2xl mx-auto bg-gradient-to-br from-[#191A24] to-[#4D789D] rounded-lg p-8 border-2 border-[#4D789D] text-center">
+            <div className="mb-6">
               <div className="bg-[#E99E1B] h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Check size={32} className="text-white" />
               </div>
               <h1 className="text-3xl font-bold mb-2">Booking Confirmed!</h1>
-              <p className="text-[#CCCCCC]">
-                Your court has been successfully booked.
-              </p>
+              <p className="text-[#CCCCCC]">Your court has been booked.</p>
               {bookingRef && (
                 <p className="text-sm text-[#CCCCCC] mt-2">Ref: {bookingRef}</p>
               )}
+              <p className="text-[#CCCCCC] mt-4">
+                A confirmation email has been sent to{" "}
+                <strong>{userEmail}</strong>.
+              </p>
             </div>
-
-            <div className="border-t border-b border-[#4D789D] py-6 mb-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-[#CCCCCC] text-sm">Date</p>
-                  <p className="font-medium">{formatDate(date)}</p>
-                </div>
-                <div>
-                  <p className="text-[#CCCCCC] text-sm">Time</p>
-                  {times.map((t) => (
-                    <p key={t} className="font-medium">
-                      {t}
-                    </p>
-                  ))}
-                </div>
-                <div>
-                  <p className="text-[#CCCCCC] text-sm">Court</p>
-                  <p className="font-medium">
-                    {courtName} ({courtType})
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[#CCCCCC] text-sm">Total</p>
-                  <p className="font-medium text-[#E99E1B]">₹{price}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-center">
-              <Link
-                href="/"
-                className="bg-[#E99E1B] hover:bg-[#D68E13] px-6 py-3 rounded-lg text-white"
-              >
-                Return to Home
-              </Link>
-            </div>
+            <Link
+              href="/"
+              className="bg-[#E99E1B] hover:bg-[#D68E13] px-6 py-3 rounded-lg text-white"
+            >
+              Return to Home
+            </Link>
           </div>
         </div>
       </div>
     );
 
+  /* ------------ booking form view ----------------------------- */
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2E3D5A] to-[#5A8FC8] text-white pt-35 pb-16">
+    <div className="min-h-screen bg-gradient-to-br from-[#2E3D5A] to-[#5A8FC8] text-white pt-40 pb-16">
       <div className="container mx-auto px-4">
         <Link
           href={`/book-slots?courtId=${courtId}`}
@@ -181,6 +187,7 @@ export default function BookClient() {
           Fill in your details to confirm your reservation.
         </p>
 
+        {/* Summary */}
         <div className="bg-gradient-to-br from-[#191A24] to-[#4D789D] rounded-lg p-6 border-2 border-[#4D789D] mb-8">
           <h2 className="text-xl font-bold mb-4">Booking Summary</h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -195,7 +202,6 @@ export default function BookClient() {
               <span className="font-medium">{times.join(" | ")}</span>
             </div>
           </div>
-
           <div className="flex items-start mt-4">
             <div
               className="bg-gradient-to-br from-[#191A24] to-[#4D789D] h-12 w-12 rounded-md overflow-hidden mr-3 mt-1 flex-shrink-0"
@@ -216,6 +222,7 @@ export default function BookClient() {
           </div>
         </div>
 
+        {/* Form */}
         <div className="bg-gradient-to-br from-[#191A24] to-[#4D789D] rounded-lg p-6 border-2 border-[#4D789D]">
           <h2 className="text-xl font-bold mb-6">Personal Information</h2>
           <form onSubmit={handleSubmit}>
@@ -223,28 +230,45 @@ export default function BookClient() {
               icon={<User size={16} className="text-[#CCCCCC]" />}
               id="name"
               label="Full Name *"
+              type="text"
               value={formData.name}
               onChange={onInput}
               required
+              error={errors.name}
             />
             <InputRow
               icon={<Mail size={16} className="text-[#CCCCCC]" />}
               id="email"
+              label="Email (@gmail.com) *"
               type="email"
-              label="Email Address *"
               value={formData.email}
               onChange={onInput}
               required
+              error={errors.email}
             />
-            <InputRow
-              icon={<Phone size={16} className="text-[#CCCCCC]" />}
-              id="phone"
-              type="tel"
-              label="Phone Number *"
-              value={formData.phone}
-              onChange={onInput}
-              required
-            />
+            <div className="mb-4">
+              <label htmlFor="phone" className="block text-[#CCCCCC] mb-2">
+                Phone Number *
+              </label>
+              <div className="flex">
+                <span className="inline-flex items-center px-3 bg-gray-800 border border-r-0 border-gray-700 text-white rounded-l-lg">
+                  +91
+                </span>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="localNumber"
+                  value={formData.localNumber}
+                  onChange={onInput}
+                  placeholder="XXXXXXXXXX"
+                  required
+                  className="bg-gray-800 border border-gray-700 rounded-r-lg py-2 px-3 flex-1 text-white focus:ring-1 focus:ring-[#E99E1B] focus:border-[#E99E1B]"
+                />
+              </div>
+              {errors.phone && (
+                <p className="text-[#FF6B6B] text-sm mt-1">{errors.phone}</p>
+              )}
+            </div>
 
             <h2 className="text-xl font-bold mb-4">Payment Method</h2>
             <div className="mb-6">
@@ -275,7 +299,6 @@ export default function BookClient() {
                   name="agreeToTerms"
                   checked={formData.agreeToTerms}
                   onChange={onInput}
-                  required
                   className="mt-1 mr-2 text-[#E99E1B] focus:ring-[#E99E1B]"
                 />
                 <span className="text-[#CCCCCC] text-sm">
@@ -283,6 +306,11 @@ export default function BookClient() {
                   cancellation policy.
                 </span>
               </label>
+              {errors.agreeToTerms && (
+                <p className="text-[#FF6B6B] text-sm mt-1">
+                  {errors.agreeToTerms}
+                </p>
+              )}
             </div>
 
             <motion.button
@@ -313,6 +341,7 @@ function InputRow({
   value,
   onChange,
   required = false,
+  error,
 }: {
   icon: React.ReactNode;
   id: string;
@@ -321,6 +350,7 @@ function InputRow({
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   required?: boolean;
+  error?: string;
 }) {
   return (
     <div className="mb-4">
@@ -340,6 +370,7 @@ function InputRow({
           className="bg-gray-800 border border-gray-700 rounded-lg py-2 px-10 w-full text-white focus:ring-1 focus:ring-[#E99E1B] focus:border-[#E99E1B]"
         />
       </div>
+      {error && <p className="text-[#FF6B6B] text-sm mt-1">{error}</p>}
     </div>
   );
 }
@@ -387,17 +418,17 @@ function Spinner() {
       viewBox="0 0 24 24"
     >
       <circle
-        className="opacity-25"
         cx="12"
         cy="12"
         r="10"
         stroke="currentColor"
         strokeWidth="4"
+        className="opacity-25"
       />
       <path
-        className="opacity-75"
         fill="currentColor"
         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        className="opacity-75"
       />
     </svg>
   );

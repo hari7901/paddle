@@ -41,6 +41,8 @@ export default function BookSlotsClient() {
   const router = useRouter();
 
   const courtId = sp.get("courtId") || "";
+  const otherCourtId = courtId === "court-1" ? "court-2" : "court-1";
+
   const todayISO = getLocalISO(new Date());
 
   const [date, setDate] = useState<string>(todayISO);
@@ -64,7 +66,7 @@ export default function BookSlotsClient() {
       .catch(() => setErr("Could not load court."));
   }, [courtId, router]);
 
-  /* Fetch slots on date change (always from server) */
+  /* Fetch slots on date change */
   useEffect(() => {
     if (!courtId) return;
     abortRef.current?.abort();
@@ -125,12 +127,24 @@ export default function BookSlotsClient() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2E3D5A] to-[#5A8FC8] text-white pt-35 pb-16">
       <div className="container mx-auto px-4">
-        <Link
-          href="/"
-          className="inline-flex items-center text-[#CCCCCC] hover:text-[#E99E1B] mb-6"
-        >
-          <ArrowLeft size={16} className="mr-2" /> Back to Home
-        </Link>
+        {/* Navigation: Back + Switch Court */}
+        <div className="flex flex-wrap gap-4 mb-6">
+          <Link
+            href="/"
+            className="inline-flex items-center bg-[#E99E1B] hover:bg-[#D68E13] text-white font-semibold px-5 py-2 rounded-lg transition-colors"
+          >
+            <ArrowLeft size={16} className="mr-2" />
+            Back to Home
+          </Link>
+          <Link
+            href={`/book-slots?courtId=${otherCourtId}`}
+            className="inline-flex items-center bg-[#E99E1B] hover:bg-[#D68E13] text-white font-semibold px-5 py-2 rounded-lg transition-colors"
+          >
+            {court.type === "Singles"
+              ? "View Doubles Court Slots"
+              : "View Singles Court Slots"}
+          </Link>
+        </div>
 
         {/* Court info + Date picker */}
         <div className="flex flex-col md:flex-row gap-8 mb-8">
