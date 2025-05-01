@@ -25,10 +25,15 @@ function getLocalISO(date: Date) {
   return `${y}-${m}-${d}`;
 }
 
-/** Format YYYY-MM-DD into a more human friendly string */
+/** Format YYYY-MM-DD into a more human-friendly string */
 function formatLocalDate(iso: string) {
   const [y, m, d] = iso.split("-").map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString("en-US");
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 export default function BookSlotsClient() {
@@ -45,7 +50,6 @@ export default function BookSlotsClient() {
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const cache = useRef<Record<string, Slot[]>>({});
   const abortRef = useRef<AbortController | null>(null);
 
   /* Fetch court info once */
@@ -60,28 +64,17 @@ export default function BookSlotsClient() {
       .catch(() => setErr("Could not load court."));
   }, [courtId, router]);
 
-  /* Fetch slots whenever “date” changes */
+  /* Fetch slots on date change (always from server) */
   useEffect(() => {
     if (!courtId) return;
-    const key = `${date}|${courtId}`;
-
-    if (cache.current[key]) {
-      setSlots(cache.current[key]);
-      setSelected([]);
-      return;
-    }
-
     abortRef.current?.abort();
     const ctrl = new AbortController();
     abortRef.current = ctrl;
 
     setLoading(true);
-    fetch(`/api/slots?courtId=${courtId}&date=${date}`, {
-      signal: ctrl.signal,
-    })
+    fetch(`/api/slots?courtId=${courtId}&date=${date}`, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((data: Slot[]) => {
-        cache.current[key] = data;
         setSlots(data);
         setSelected([]);
       })
@@ -91,7 +84,9 @@ export default function BookSlotsClient() {
       .finally(() => setLoading(false));
   }, [courtId, date]);
 
-  /* Toggle slot selection */
+  if (err) return <FullScreen text={err} />;
+  if (!court) return <FullScreen text="Loading…" spinner />;
+
   const toggle = (s: Slot) =>
     setSelected((prev) =>
       prev.find((x) => x.id === s.id)
@@ -99,7 +94,6 @@ export default function BookSlotsClient() {
         : [...prev, s]
     );
 
-  /* Proceed to booking page */
   const proceed = () => {
     if (!court || !selected.length) return;
     const params = new URLSearchParams({
@@ -114,7 +108,7 @@ export default function BookSlotsClient() {
     router.push(`/book?${params.toString()}`);
   };
 
-  /* Build next 7 local dates for the picker */
+  /* next 7 local dates for picker */
   const week = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() + i);
@@ -127,9 +121,6 @@ export default function BookSlotsClient() {
       }),
     };
   });
-
-  if (err) return <FullScreen text={err} />;
-  if (!court) return <FullScreen text="Loading…" spinner />;
 
   return (
     <div className="min-h-screen bg-black text-white pt-35 pb-16">
@@ -181,7 +172,7 @@ export default function BookSlotsClient() {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {loading
-              ? Array.from({ length: 15 }).map((_, i) => (
+              ? Array.from({ length: 17 }).map((_, i) => (
                   <div
                     key={i}
                     className="h-16 rounded-lg bg-gray-800 animate-pulse"
@@ -196,7 +187,7 @@ export default function BookSlotsClient() {
                     return (
                       <div
                         key={s.id}
-                        className={`${base} border-red-700 bg-red-900/40 text-red-300 cursor-default pointer-events-none`}
+                        className={`${base} border-red-700 bg-red-900/40 text-red-300 cursor-default`}
                       >
                         <span>{s.time}</span>
                         <span className="text-xs mt-0.5">Booked</span>
