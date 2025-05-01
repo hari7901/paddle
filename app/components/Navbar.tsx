@@ -1,3 +1,4 @@
+// app/components/Navbar.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -26,11 +27,11 @@ const Navbar = () => {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white shadow-md py-2" : "bg-black bg-opacity-50 py-4"
+        isScrolled ? "bg-[#191A24] shadow-md py-2" : "bg-[#191A24]/30 py-4"
       }`}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
-        {/* Logo link */}
+        {/* Logo */}
         <Link href="/" className="flex items-center">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -38,8 +39,7 @@ const Navbar = () => {
             transition={{ duration: 0.5 }}
             className="flex items-center"
           >
-            {/* Logo wrapper: always transparent so it inherits header bg */}
-            <div className="mr-2 rounded-full overflow-hidden bg-transparent transition-colors duration-300">
+            <div className="mr-2 rounded-full overflow-hidden bg-transparent">
               <Image
                 src="/logo.svg"
                 alt="ProPlay Sports Logo"
@@ -62,11 +62,7 @@ const Navbar = () => {
             >
               <Link
                 href={link.href}
-                className={`font-medium transition-colors ${
-                  isScrolled
-                    ? "text-black hover:text-green-600"
-                    : "text-white hover:text-green-400"
-                }`}
+                className="font-medium text-[#CCCCCC] hover:text-[#E99E1B] transition-colors"
               >
                 {link.name}
               </Link>
@@ -79,9 +75,7 @@ const Navbar = () => {
           className="md:hidden text-2xl"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          <span className={isScrolled ? "text-black" : "text-white"}>
-            {isMobileMenuOpen ? "✕" : "☰"}
-          </span>
+          <span className="text-[#CCCCCC]">{isMobileMenuOpen ? "✕" : "☰"}</span>
         </button>
       </div>
 
@@ -91,15 +85,15 @@ const Navbar = () => {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
-          className="md:hidden bg-white shadow-lg"
+          className="md:hidden bg-[#191A24] shadow-lg"
         >
           <div className="container mx-auto px-4 py-4">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className="block py-2 text-black hover:text-green-600 transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
+                className="block py-2 text-[#CCCCCC] hover:text-[#E99E1B] transition-colors"
               >
                 {link.name}
               </Link>

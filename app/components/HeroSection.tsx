@@ -66,7 +66,7 @@ const HeroSection = () => {
             i === currentSlide ? "opacity-100" : "opacity-0"
           }`}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/40 to-green-900/40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/40 to-[#2E3D5A]/40" />
           <div
             className="w-full h-full bg-cover bg-center"
             style={{ backgroundImage: `url(${s.image})` }}
@@ -101,7 +101,7 @@ const HeroSection = () => {
               <motion.div variants={item}>
                 <Link
                   href={`/book-slots?courtId=${slides[currentSlide].courtId}`}
-                  className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 md:px-8 md:py-4 rounded-lg transition-transform duration-300 transform hover:scale-105 active:scale-95 shadow-lg"
+                  className="inline-block bg-[#E99E1B] hover:bg-[#D68E13] text-white font-semibold px-6 py-3 md:px-8 md:py-4 rounded-lg transition-transform duration-300 transform hover:scale-105 active:scale-95 shadow-lg"
                 >
                   {slides[currentSlide].buttonText}
                 </Link>
@@ -120,7 +120,7 @@ const HeroSection = () => {
               onClick={() => goTo(i)}
               className={`h-3 rounded-full transition-all duration-300 ${
                 i === currentSlide
-                  ? "bg-green-500 w-8"
+                  ? "bg-[#E99E1B] w-8"
                   : "w-3 bg-white bg-opacity-50 hover:bg-opacity-75"
               }`}
               aria-label={`Go to slide ${i + 1}`}

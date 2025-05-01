@@ -123,11 +123,11 @@ export default function BookSlotsClient() {
   });
 
   return (
-    <div className="min-h-screen bg-black text-white pt-35 pb-16">
+    <div className="min-h-screen bg-gradient-to-br from-[#2E3D5A] to-[#5A8FC8] text-white pt-35 pb-16">
       <div className="container mx-auto px-4">
         <Link
           href="/"
-          className="inline-flex items-center text-gray-300 hover:text-green-400 mb-6"
+          className="inline-flex items-center text-[#CCCCCC] hover:text-[#E99E1B] mb-6"
         >
           <ArrowLeft size={16} className="mr-2" /> Back to Home
         </Link>
@@ -139,8 +139,12 @@ export default function BookSlotsClient() {
             <h2 className="text-2xl font-bold mb-4">
               Select a Date &amp; Time
             </h2>
-            <p className="text-gray-300 mb-6">Choose your preferred slot(s).</p>
-            <label className="block mb-2 font-medium">Date</label>
+            <p className="text-[#CCCCCC] mb-6">
+              Choose your preferred slot(s).
+            </p>
+            <label className="block mb-2 font-medium text-[#CCCCCC]">
+              Date
+            </label>
             <div className="flex overflow-x-auto pb-2">
               {week.map((d) => (
                 <button
@@ -148,8 +152,8 @@ export default function BookSlotsClient() {
                   onClick={() => setDate(d.value)}
                   className={`p-3 border rounded-lg mr-2 whitespace-nowrap ${
                     d.value === date
-                      ? "bg-green-600 border-green-600 text-white"
-                      : "border-gray-700 hover:border-green-500 text-gray-300"
+                      ? "bg-[#E99E1B] border-[#E99E1B] text-white"
+                      : "border-[#4D789D] hover:border-[#E99E1B] text-[#CCCCCC]"
                   }`}
                 >
                   {d.label}
@@ -160,12 +164,12 @@ export default function BookSlotsClient() {
         </div>
 
         {/* Slots grid */}
-        <div className="bg-gray-900 rounded-lg p-6 border-2 border-green-800">
+        <div className="bg-gradient-to-br from-[#191A24] to-[#4D789D] rounded-lg p-6 border border-[#4D789D]">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold">
+            <h3 className="text-xl font-bold text-white">
               Slots • {formatLocalDate(date)}
             </h3>
-            <span className="text-sm text-gray-300 flex items-center">
+            <span className="text-sm text-[#CCCCCC] flex items-center">
               <Clock size={16} className="mr-2" /> 6 AM – 11 PM
             </span>
           </div>
@@ -175,7 +179,7 @@ export default function BookSlotsClient() {
               ? Array.from({ length: 17 }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-16 rounded-lg bg-gray-800 animate-pulse"
+                    className="h-16 rounded-lg bg-[#191A24]/20 animate-pulse"
                   />
                 ))
               : slots.map((s) => {
@@ -203,8 +207,8 @@ export default function BookSlotsClient() {
                       whileTap={{ scale: 0.95 }}
                       className={`${base} cursor-pointer ${
                         isSel
-                          ? "bg-green-600 border-green-600 text-white"
-                          : "bg-green-900/40 border-green-600 hover:bg-green-800"
+                          ? "bg-[#E99E1B] border-[#E99E1B] text-white"
+                          : "bg-[#191A24]/30 border-[#4D789D] hover:bg-[#4D789D]/20 text-[#CCCCCC]"
                       }`}
                     >
                       {s.time}
@@ -215,16 +219,16 @@ export default function BookSlotsClient() {
 
           {/* Footer */}
           <div className="mt-6 flex justify-between items-center">
-            <p className="text-sm">
+            <p className="text-sm text-[#CCCCCC]">
               Selected <b>{selected.length}</b> • Total&nbsp;
-              <span className="text-green-400 font-semibold">
+              <span className="text-[#E99E1B] font-semibold">
                 ₹{court.price * selected.length}
               </span>
             </p>
             <button
               onClick={proceed}
               disabled={!selected.length}
-              className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg disabled:opacity-50"
+              className="bg-[#E99E1B] hover:bg-[#D68E13] px-6 py-3 rounded-lg disabled:opacity-50 text-white"
             >
               Continue
             </button>
@@ -244,11 +248,11 @@ function CourtCard({ court }: { court: Court }) {
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent p-6 flex items-end">
           <div>
-            <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">
+            <span className="bg-[#E99E1B] text-white text-xs px-2 py-1 rounded">
               {court.type}
             </span>
-            <h1 className="text-2xl font-bold mt-2">{court.name}</h1>
-            <p className="text-green-400 font-bold mt-1">₹{court.price}/hour</p>
+            <h1 className="text-2xl font-bold mt-2 text-white">{court.name}</h1>
+            <p className="text-[#E99E1B] font-bold mt-1">₹{court.price}/hour</p>
           </div>
         </div>
       </div>
@@ -264,11 +268,11 @@ function FullScreen({
   spinner?: boolean;
 }) {
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-[#2E3D5A] to-[#5A8FC8] text-white flex items-center justify-center">
       {spinner ? (
-        <div className="animate-pulse">{text}</div>
+        <div className="animate-pulse text-[#CCCCCC]">{text}</div>
       ) : (
-        <p className="bg-red-900/20 border border-red-700 rounded-lg px-6 py-4">
+        <p className="bg-red-900/20 border border-red-700 rounded-lg px-6 py-4 text-[#CCCCCC]">
           {text}
         </p>
       )}

@@ -1,7 +1,7 @@
+// app/components/BookingSection.tsx
 "use client";
 
 import { motion } from "framer-motion";
-import { Calendar, Shield, Award } from "lucide-react";
 import BookingPreview from "./BookingPreview";
 
 const BookingSection = () => {
@@ -56,12 +56,12 @@ const BookingSection = () => {
   return (
     <div
       id="booking"
-      className="py-20 bg-black text-white relative overflow-hidden"
+      className="py-20 bg-gradient-to-br from-[#2E3D5A] to-[#5A8FC8] text-white relative overflow-hidden"
     >
       {/* decorative lines & blobs */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-900/0 via-green-600 to-green-900/0" />
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-900/20 rounded-full blur-3xl" />
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-green-900/20 rounded-full blur-3xl" />
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#2E3D5A]/0 via-[#E99E1B] to-[#2E3D5A]/0" />
+      <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#5A8FC8]/20 rounded-full blur-3xl" />
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#5A8FC8]/20 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* header */}
@@ -71,9 +71,9 @@ const BookingSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="inline-block bg-green-900/30 rounded-full px-4 py-1 mb-4"
+            className="inline-block bg-[#191A24]/30 rounded-full px-4 py-1 mb-4"
           >
-            <span className="text-green-400 text-sm font-semibold tracking-wider uppercase">
+            <span className="text-[#E99E1B] text-sm font-semibold tracking-wider uppercase">
               Reserve Your Spot
             </span>
           </motion.div>
@@ -93,7 +93,7 @@ const BookingSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             viewport={{ once: true }}
-            className="text-lg text-gray-300 max-w-2xl mx-auto"
+            className="text-lg text-[#CCCCCC] max-w-2xl mx-auto"
           >
             Choose from our premium paddle courts and find available time slots
             that fit your schedule. Easy booking process, instant confirmation.
@@ -125,8 +125,6 @@ const BookingSection = () => {
             </motion.div>
           ))}
         </motion.div>
-
-        
       </div>
     </div>
   );

@@ -20,7 +20,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-black text-white">
+    <footer className="bg-gradient-to-br from-[#191A24] to-[#2E3D5A] text-white">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand and Info */}
@@ -32,7 +32,7 @@ const Footer = () => {
                 className="h-10 w-auto mr-2"
               />
             </Link>
-            <p className="text-gray-300 mb-6">
+            <p className="text-[#CCCCCC] mb-6">
               Premier padel court facilities for singles and doubles play. Book
               your court today and enjoy the game!
             </p>
@@ -40,7 +40,7 @@ const Footer = () => {
               {/* Social icons */}
               <a
                 href="#"
-                className="text-gray-300 hover:text-green-400 transition-colors"
+                className="text-[#CCCCCC] hover:text-[#E99E1B] transition-colors"
                 aria-label="Facebook"
               >
                 <svg
@@ -67,7 +67,7 @@ const Footer = () => {
                 <li key={idx}>
                   <Link
                     href={link.href}
-                    className="text-gray-300 hover:text-green-400 transition-colors"
+                    className="text-[#CCCCCC] hover:text-[#E99E1B] transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -84,7 +84,7 @@ const Footer = () => {
                 <li key={idx}>
                   <Link
                     href={link.href}
-                    className="text-gray-300 hover:text-green-400 transition-colors"
+                    className="text-[#CCCCCC] hover:text-[#E99E1B] transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -100,13 +100,13 @@ const Footer = () => {
               <li className="flex items-start">
                 <MapPin
                   size={20}
-                  className="mr-3 text-green-400 flex-shrink-0 mt-1"
+                  className="mr-3 text-[#4D789D] flex-shrink-0 mt-1"
                 />
                 <a
                   href="https://maps.app.goo.gl/5QdYzyt2853gVvCS6?g_st=com.google.maps.preview.copy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-green-400 transition-colors underline"
+                  className="text-[#CCCCCC] hover:text-[#E99E1B] transition-colors underline"
                 >
                   Ozmo Gym &amp; Spa – South City, Ludhiana
                 </a>
@@ -114,15 +114,15 @@ const Footer = () => {
               <li className="flex items-center">
                 <Phone
                   size={20}
-                  className="mr-3 text-green-400 flex-shrink-0"
+                  className="mr-3 text-[#4D789D] flex-shrink-0"
                 />
-                <span className="text-gray-300 hover:text-white transition-colors">
+                <span className="text-[#CCCCCC] hover:text-[#E99E1B] transition-colors">
                   +91 90410 13409
                 </span>
               </li>
               <li className="flex items-center">
-                <Mail size={20} className="mr-3 text-green-400 flex-shrink-0" />
-                <span className="text-gray-300 hover:text-white transition-colors">
+                <Mail size={20} className="mr-3 text-[#4D789D] flex-shrink-0" />
+                <span className="text-[#CCCCCC] hover:text-[#E99E1B] transition-colors">
                   proplaysports032@gmail.com
                 </span>
               </li>
@@ -131,7 +131,7 @@ const Footer = () => {
             <div className="mt-6">
               <Link
                 href="/book-slots?courtId=court-1"
-                className="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2 rounded-lg transition-colors inline-block"
+                className="bg-[#E99E1B] hover:bg-[#D68E13] text-white font-medium px-5 py-2 rounded-lg transition-colors inline-block"
               >
                 Book Now
               </Link>
@@ -140,8 +140,8 @@ const Footer = () => {
         </div>
 
         {/* Bottom line */}
-        <div className="border-t border-gray-800 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-gray-400">
+        <div className="border-t border-[#191A24] mt-12 pt-6 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-sm text-[#CCCCCC]">
             &copy; {currentYear} Proyard Padel. All rights reserved.
           </p>
         </div>

@@ -8,17 +8,17 @@ export const metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <main className="bg-black text-white min-h-screen py-40">
+    <main className="bg-gradient-to-br from-[#2E3D5A] to-[#5A8FC8] text-white min-h-screen py-40">
       <div className="container mx-auto px-4 md:px-8 lg:px-16">
         <h1 className="text-4xl font-bold mb-6">Privacy Policy</h1>
 
-        <p className="mb-6 text-gray-300">
+        <p className="mb-6 text-[#CCCCCC]">
           Last updated: April 28, 2025
           <br />
           Proyard Padel (“we”, “us”, or “our”) operates{" "}
           <a
             href="https://proyardpadel.com"
-            className="text-green-400 hover:underline"
+            className="text-[#E99E1B] hover:underline"
           >
             https://proyardpadel.com
           </a>{" "}
@@ -31,7 +31,7 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-2xl font-semibold mb-4">
             1. Information We Collect
           </h2>
-          <ul className="list-disc list-inside text-gray-300 space-y-2">
+          <ul className="list-disc list-inside text-[#CCCCCC] space-y-2">
             <li>
               <strong>Booking Data:</strong> Name, email address, phone number,
               date, time, court selection, and payment details.
@@ -52,7 +52,7 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-2xl font-semibold mb-4">
             2. How We Use Your Information
           </h2>
-          <ul className="list-disc list-inside text-gray-300 space-y-2">
+          <ul className="list-disc list-inside text-[#CCCCCC] space-y-2">
             <li>To process and confirm your court booking.</li>
             <li>
               To send you booking confirmations, reminders, and occasional
@@ -67,7 +67,7 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-2xl font-semibold mb-4">
             3. Cookies &amp; Tracking
           </h2>
-          <p className="text-gray-300 mb-2">
+          <p className="text-[#CCCCCC] mb-2">
             We use cookies and similar technologies to enable basic Site
             functionality and to understand how visitors use the Site (e.g., via
             Google Analytics). You may disable cookies in your browser, although
@@ -79,7 +79,7 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-2xl font-semibold mb-4">
             4. Sharing Your Information
           </h2>
-          <ul className="list-disc list-inside text-gray-300 space-y-2">
+          <ul className="list-disc list-inside text-[#CCCCCC] space-y-2">
             <li>Payment processors (e.g., Stripe) to complete transactions.</li>
             <li>
               Service providers for hosting, email delivery, and analytics.
@@ -92,7 +92,7 @@ export default function PrivacyPolicyPage() {
 
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">5. Data Security</h2>
-          <p className="text-gray-300">
+          <p className="text-[#CCCCCC]">
             We take reasonable measures—such as HTTPS encryption and secure data
             storage—to protect your information from unauthorized access.
           </p>
@@ -100,7 +100,7 @@ export default function PrivacyPolicyPage() {
 
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">6. Children’s Privacy</h2>
-          <p className="text-gray-300">
+          <p className="text-[#CCCCCC]">
             Our services are not intended for children under 13, and we do not
             knowingly collect personal data from minors.
           </p>
@@ -110,7 +110,7 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-2xl font-semibold mb-4">
             7. Changes to This Policy
           </h2>
-          <p className="text-gray-300">
+          <p className="text-[#CCCCCC]">
             We may update this policy. The “Last updated” date will indicate
             when changes occur. Please review periodically.
           </p>
@@ -118,13 +118,13 @@ export default function PrivacyPolicyPage() {
 
         <section className="mb-12">
           <h2 className="text-2xl font-semibold mb-4">8. Contact Us</h2>
-          <p className="text-gray-300">For questions about this policy:</p>
-          <ul className="list-disc list-inside text-gray-300 mt-4 space-y-2">
+          <p className="text-[#CCCCCC]">For questions about this policy:</p>
+          <ul className="list-disc list-inside text-[#CCCCCC] mt-4 space-y-2">
             <li>
               Email:{" "}
               <a
                 href="mailto:proplaysports032@gmail.com"
-                className="text-green-400 hover:underline"
+                className="text-[#E99E1B] hover:underline"
               >
                 proplaysports032@gmail.com
               </a>
@@ -133,7 +133,7 @@ export default function PrivacyPolicyPage() {
               Phone:{" "}
               <a
                 href="tel:+919041013409"
-                className="text-green-400 hover:underline"
+                className="text-[#E99E1B] hover:underline"
               >
                 +91 90410 13409
               </a>
@@ -144,7 +144,7 @@ export default function PrivacyPolicyPage() {
                 href="https://maps.app.goo.gl/5QdYzyt2853gVvCS6?g_st=com.google.maps.preview.copy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-green-400 hover:underline"
+                className="text-[#E99E1B] hover:underline"
               >
                 Ozmo Gym & Spa – South City, Ludhiana
               </a>

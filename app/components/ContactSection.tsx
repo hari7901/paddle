@@ -1,3 +1,4 @@
+// app/components/ContactSection.tsx
 "use client";
 
 import { useState } from "react";
@@ -37,12 +38,12 @@ const ContactSection = () => {
 
   return (
     <div
-      className="py-20 bg-black text-white relative overflow-hidden"
+      className="py-20 bg-gradient-to-br from-[#2E3D5A] to-[#5A8FC8] text-white relative overflow-hidden"
       id="contact"
     >
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-900/0 via-green-600 to-green-900/0"></div>
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-900/20 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-green-900/20 rounded-full blur-3xl"></div>
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#2E3D5A]/0 via-[#E99E1B] to-[#2E3D5A]/0"></div>
+      <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#5A8FC8]/20 rounded-full blur-3xl"></div>
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#5A8FC8]/20 rounded-full blur-3xl"></div>
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
@@ -58,9 +59,9 @@ const ContactSection = () => {
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
             viewport={{ once: true }}
-            className="inline-block bg-green-900/30 rounded-full px-4 py-1 mb-4"
+            className="inline-block bg-[#191A24]/30 rounded-full px-4 py-1 mb-4"
           >
-            <span className="text-green-400 text-sm font-semibold tracking-wider uppercase">
+            <span className="text-[#E99E1B] text-sm font-semibold tracking-wider uppercase">
               Get In Touch
             </span>
           </motion.div>
@@ -80,7 +81,7 @@ const ContactSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
             viewport={{ once: true }}
-            className="text-lg text-gray-300 max-w-2xl mx-auto"
+            className="text-lg text-[#CCCCCC] max-w-2xl mx-auto"
           >
             Have questions or need assistance? Reach out to our team and we'll
             get back to you as soon as possible.
@@ -96,56 +97,56 @@ const ContactSection = () => {
             stiffness: 50,
           }}
           viewport={{ once: true }}
-          className="max-w-5xl mx-auto bg-gradient-to-br from-gray-900 to-black text-white rounded-xl shadow-2xl overflow-hidden border border-green-800"
+          className="max-w-5xl mx-auto bg-gradient-to-br from-[#191A24] to-[#4D789D] rounded-xl shadow-2xl overflow-hidden border border-[#4D789D]"
         >
           <div className="md:flex">
             {/* Contact Information */}
-            <div className="md:w-1/3 bg-green-900/30 text-white p-8 relative">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-900/0 via-green-600 to-green-900/0"></div>
+            <div className="md:w-1/3 bg-[#191A24]/30 text-white p-8 relative">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#2E3D5A]/0 via-[#E99E1B] to-[#2E3D5A]/0"></div>
               <h3 className="text-2xl font-bold mb-6">Get In Touch</h3>
 
               <div className="space-y-6">
                 <div className="group">
-                  <div className="flex items-center mb-3 group-hover:text-green-400 transition-colors">
-                    <Phone size={20} className="mr-3" />
+                  <div className="flex items-center mb-3 transition-colors group-hover:text-[#4D789D]">
+                    <Phone size={20} className="mr-3 text-[#4D789D]" />
                     <h4 className="font-bold">Phone</h4>
                   </div>
-                  <p className="pl-8 text-gray-300 group-hover:text-white transition-colors">
+                  <p className="pl-8 text-[#CCCCCC] group-hover:text-white transition-colors">
                     +91 90410 13409
                   </p>
                 </div>
 
                 <div className="group">
-                  <div className="flex items-center mb-3 group-hover:text-green-400 transition-colors">
-                    <Mail size={20} className="mr-3" />
+                  <div className="flex items-center mb-3 transition-colors group-hover:text-[#4D789D]">
+                    <Mail size={20} className="mr-3 text-[#4D789D]" />
                     <h4 className="font-bold">Email</h4>
                   </div>
-                  <p className="pl-8 text-gray-300 group-hover:text-white transition-colors">
+                  <p className="pl-8 text-[#CCCCCC] group-hover:text-white transition-colors">
                     proplaysports032@gmail.com
                   </p>
                 </div>
 
                 <div className="group">
-                  <div className="flex items-center mb-3 group-hover:text-green-400 transition-colors">
-                    <MapPin size={20} className="mr-3" />
+                  <div className="flex items-center mb-3 transition-colors group-hover:text-[#4D789D]">
+                    <MapPin size={20} className="mr-3 text-[#4D789D]" />
                     <h4 className="font-bold">Address</h4>
                   </div>
                   <a
                     href="https://maps.app.goo.gl/5QdYzyt2853gVvCS6?g_st=com.google.maps.preview.copy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="pl-8 text-gray-300 group-hover:text-white transition-colors hover:underline"
+                    className="pl-8 text-[#CCCCCC] group-hover:text-white transition-colors hover:underline"
                   >
                     Ozmo Gym &amp; Spa – South City, Ludhiana
                   </a>
                 </div>
 
                 <div className="group">
-                  <div className="flex items-center mb-3 group-hover:text-green-400 transition-colors">
-                    <Clock size={20} className="mr-3" />
+                  <div className="flex items-center mb-3 transition-colors group-hover:text-[#4D789D]">
+                    <Clock size={20} className="mr-3 text-[#4D789D]" />
                     <h4 className="font-bold">Business Hours</h4>
                   </div>
-                  <p className="text-gray-300 group-hover:text-white transition-colors">
+                  <p className="pl-8 text-[#CCCCCC] group-hover:text-white transition-colors">
                     Mon–Fri: 9 AM – 9 PM
                     <br />
                     Sat–Sun: 8 AM – 8 PM
@@ -162,7 +163,7 @@ const ContactSection = () => {
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-green-900/30 border border-green-600 text-green-400 px-4 py-3 rounded mb-6"
+                  className="bg-[#191A24]/30 border border-[#4D789D] text-[#4D789D] px-4 py-3 rounded mb-6"
                 >
                   <p>Thank you for your message! We'll get back to you soon.</p>
                 </motion.div>
@@ -172,7 +173,7 @@ const ContactSection = () => {
                     <div>
                       <label
                         htmlFor="name"
-                        className="block text-gray-300 font-medium mb-2"
+                        className="block text-[#CCCCCC] font-medium mb-2"
                       >
                         Your Name
                       </label>
@@ -182,14 +183,14 @@ const ContactSection = () => {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white"
+                        className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#E99E1B] focus:border-[#E99E1B] text-white"
                         required
                       />
                     </div>
                     <div>
                       <label
                         htmlFor="email"
-                        className="block text-gray-300 font-medium mb-2"
+                        className="block text-[#CCCCCC] font-medium mb-2"
                       >
                         Email Address
                       </label>
@@ -199,7 +200,7 @@ const ContactSection = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white"
+                        className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#E99E1B] focus:border-[#E99E1B] text-white"
                         required
                       />
                     </div>
@@ -208,7 +209,7 @@ const ContactSection = () => {
                   <div>
                     <label
                       htmlFor="phone"
-                      className="block text-gray-300 font-medium mb-2"
+                      className="block text-[#CCCCCC] font-medium mb-2"
                     >
                       Phone Number
                     </label>
@@ -218,14 +219,14 @@ const ContactSection = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white"
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#E99E1B] focus:border-[#E99E1B] text-white"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="message"
-                      className="block text-gray-300 font-medium mb-2"
+                      className="block text-[#CCCCCC] font-medium mb-2"
                     >
                       Your Message
                     </label>
@@ -235,7 +236,7 @@ const ContactSection = () => {
                       value={formData.message}
                       onChange={handleChange}
                       rows={5}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white"
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#E99E1B] focus:border-[#E99E1B] text-white"
                       required
                     ></textarea>
                   </div>
@@ -245,7 +246,7 @@ const ContactSection = () => {
                     whileTap={{ scale: 0.98 }}
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full inline-flex items-center justify-center bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                    className="w-full inline-flex items-center justify-center bg-[#E99E1B] hover:bg-[#D68E13] text-white font-bold py-3 px-6 rounded-lg transition-colors"
                   >
                     {isSubmitting ? (
                       <>
@@ -273,7 +274,7 @@ const ContactSection = () => {
                       </>
                     ) : (
                       <>
-                        <Send size={18} className="mr-2" />
+                        <Send size={18} className="mr-2 text-[#4D789D]" />
                         Send Message
                       </>
                     )}

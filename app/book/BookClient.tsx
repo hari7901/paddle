@@ -1,3 +1,4 @@
+// app/book/book.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -95,8 +96,7 @@ export default function BookClient() {
       if (!res.ok) throw new Error(data.error || "Failed to create booking");
       setBookingRef(data.data._id);
       setBookingComplete(true);
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert("Could not complete booking — slot may be taken.");
     } finally {
       setIsSubmitting(false);
@@ -108,38 +108,32 @@ export default function BookClient() {
     if (!date || !courtId || slotIds.length === 0) router.push("/");
   }, [date, courtId, slotIds, router]);
 
-  /* ============================================================= */
-  /* =======================   RENDER   ========================== */
-  /* ============================================================= */
-
-  /* ---- confirmation page ---- */
   if (bookingComplete)
     return (
-      <div className="min-h-screen bg-black text-white pt-35 pb-16">
+      <div className="min-h-screen bg-gradient-to-br from-[#2E3D5A] to-[#5A8FC8] text-white pt-35 pb-16">
         <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto bg-gray-900 rounded-lg p-8 border-2 border-green-800">
+          <div className="max-w-2xl mx-auto bg-gradient-to-br from-[#191A24] to-[#4D789D] rounded-lg p-8 border-2 border-[#4D789D]">
             <div className="text-center mb-8">
-              <div className="bg-green-600 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Check size={32} />
+              <div className="bg-[#E99E1B] h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Check size={32} className="text-white" />
               </div>
               <h1 className="text-3xl font-bold mb-2">Booking Confirmed!</h1>
-              <p className="text-gray-300">
+              <p className="text-[#CCCCCC]">
                 Your court has been successfully booked.
               </p>
               {bookingRef && (
-                <p className="text-sm text-gray-400 mt-2">Ref: {bookingRef}</p>
+                <p className="text-sm text-[#CCCCCC] mt-2">Ref: {bookingRef}</p>
               )}
             </div>
 
-            {/* summary */}
-            <div className="border-t border-b border-gray-700 py-6 mb-6">
+            <div className="border-t border-b border-[#4D789D] py-6 mb-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-gray-400 text-sm">Date</p>
+                  <p className="text-[#CCCCCC] text-sm">Date</p>
                   <p className="font-medium">{formatDate(date)}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">Time</p>
+                  <p className="text-[#CCCCCC] text-sm">Time</p>
                   {times.map((t) => (
                     <p key={t} className="font-medium">
                       {t}
@@ -147,14 +141,14 @@ export default function BookClient() {
                   ))}
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">Court</p>
+                  <p className="text-[#CCCCCC] text-sm">Court</p>
                   <p className="font-medium">
                     {courtName} ({courtType})
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">Total</p>
-                  <p className="font-medium text-green-400">₹{price}</p>
+                  <p className="text-[#CCCCCC] text-sm">Total</p>
+                  <p className="font-medium text-[#E99E1B]">₹{price}</p>
                 </div>
               </div>
             </div>
@@ -162,7 +156,7 @@ export default function BookClient() {
             <div className="flex justify-center">
               <Link
                 href="/"
-                className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg"
+                className="bg-[#E99E1B] hover:bg-[#D68E13] px-6 py-3 rounded-lg text-white"
               >
                 Return to Home
               </Link>
@@ -172,166 +166,144 @@ export default function BookClient() {
       </div>
     );
 
-  /* ---- booking form ---- */
   return (
-    <div className="min-h-screen bg-black text-white pt-35 pb-16">
+    <div className="min-h-screen bg-gradient-to-br from-[#2E3D5A] to-[#5A8FC8] text-white pt-35 pb-16">
       <div className="container mx-auto px-4">
-        <div className="max-w-3xl mx-auto">
-          <Link
-            href={`/book-slots?courtId=${courtId}`}
-            className="inline-flex items-center text-gray-300 hover:text-green-400 mb-6"
-          >
-            <ArrowLeft size={16} className="mr-2" /> Back to Time Slots
-          </Link>
+        <Link
+          href={`/book-slots?courtId=${courtId}`}
+          className="inline-flex items-center text-[#CCCCCC] hover:text-[#E99E1B] mb-6"
+        >
+          <ArrowLeft size={16} className="mr-2" /> Back to Time Slots
+        </Link>
 
-          <h1 className="text-3xl font-bold mb-2">Complete Your Booking</h1>
-          <p className="text-gray-300 mb-8">
-            Fill in your details to confirm your reservation.
-          </p>
+        <h1 className="text-3xl font-bold mb-2">Complete Your Booking</h1>
+        <p className="text-[#CCCCCC] mb-8">
+          Fill in your details to confirm your reservation.
+        </p>
 
-          {/* summary */}
-          <div className="bg-gray-900 rounded-lg p-6 border-2 border-green-800 mb-8">
-            <h2 className="text-xl font-bold mb-4">Booking Summary</h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="flex items-center">
-                <Calendar size={18} className="text-green-400 mr-2" />
-                <span className="mr-2 text-gray-300">Date:</span>
-                <span className="font-medium">{formatDate(date)}</span>
-              </div>
-              <div className="flex items-center">
-                <Clock size={18} className="text-green-400 mr-2" />
-                <span className="mr-2 text-gray-300">Time:</span>
-                <span className="font-medium">{times.join("  |  ")}</span>
-              </div>
+        <div className="bg-gradient-to-br from-[#191A24] to-[#4D789D] rounded-lg p-6 border-2 border-[#4D789D] mb-8">
+          <h2 className="text-xl font-bold mb-4">Booking Summary</h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="flex items-center">
+              <Calendar size={18} className="text-[#4D789D] mr-2" />
+              <span className="mr-2 text-[#CCCCCC]">Date:</span>
+              <span className="font-medium">{formatDate(date)}</span>
             </div>
-
-            <div className="flex items-start mt-4">
-              <div
-                className="bg-gray-800 h-12 w-12 rounded-md overflow-hidden mr-3 mt-1 flex-shrink-0"
-                style={{
-                  backgroundImage:
-                    courtType === "Singles"
-                      ? "url('/paddle3.jpg')"
-                      : "url('/paddle4.jpg')",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }}
-              />
-              <div>
-                <p className="font-medium">{courtName}</p>
-                <p className="text-gray-400 text-sm">{courtType} Court</p>
-                <p className="text-green-400 font-bold">₹{price}</p>
-              </div>
+            <div className="flex items-center">
+              <Clock size={18} className="text-[#4D789D] mr-2" />
+              <span className="mr-2 text-[#CCCCCC]">Time:</span>
+              <span className="font-medium">{times.join(" | ")}</span>
             </div>
           </div>
 
-          {/* form */}
-          <div className="bg-gray-900 rounded-lg p-6 border-2 border-green-800">
-            <h2 className="text-xl font-bold mb-6">Personal Information</h2>
-            <form onSubmit={handleSubmit}>
-              {/* Name */}
-              <InputRow
-                icon={<User size={16} />}
-                id="name"
-                label="Full Name *"
-                value={formData.name}
-                onChange={onInput}
-                required
-              />
-
-              {/* Email */}
-              <InputRow
-                icon={<Mail size={16} />}
-                id="email"
-                type="email"
-                label="Email Address *"
-                value={formData.email}
-                onChange={onInput}
-                required
-              />
-
-              {/* Phone */}
-              <InputRow
-                icon={<Phone size={16} />}
-                id="phone"
-                type="tel"
-                label="Phone Number *"
-                value={formData.phone}
-                onChange={onInput}
-                required
-              />
-
-              {/* Payment */}
-              <h2 className="text-xl font-bold mb-4">Payment Method</h2>
-              <div className="mb-6">
-                <Radio
-                  id="card"
-                  name="paymentMethod"
-                  value="card"
-                  checked={formData.paymentMethod === "card"}
-                  onChange={onInput}
-                  icon={<CreditCard size={16} className="text-gray-400" />}
-                  label="Credit/Debit Card"
-                />
-                <Radio
-                  id="cash"
-                  name="paymentMethod"
-                  value="cash"
-                  checked={formData.paymentMethod === "cash"}
-                  onChange={onInput}
-                  label="Pay at Location"
-                />
-              </div>
-
-              {/* Terms */}
-              <div className="mb-8">
-                <label className="flex items-start">
-                  <input
-                    type="checkbox"
-                    id="agreeToTerms"
-                    name="agreeToTerms"
-                    checked={formData.agreeToTerms}
-                    onChange={onInput}
-                    required
-                    className="mt-1 mr-2 text-green-500 focus:ring-green-500"
-                  />
-                  <span className="text-gray-300 text-sm">
-                    I agree to the booking terms and conditions, including the
-                    cancellation policy.
-                  </span>
-                </label>
-              </div>
-
-              {/* Submit */}
-              <motion.button
-                type="submit"
-                disabled={isSubmitting}
-                whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-                whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                className={`w-full py-3 rounded-lg font-medium flex justify-center items-center
-                  ${
-                    isSubmitting
-                      ? "bg-gray-700 cursor-not-allowed"
-                      : "bg-green-600 hover:bg-green-700"
-                  }`}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Spinner /> Processing…
-                  </>
-                ) : (
-                  "Confirm Booking"
-                )}
-              </motion.button>
-            </form>
+          <div className="flex items-start mt-4">
+            <div
+              className="bg-gradient-to-br from-[#191A24] to-[#4D789D] h-12 w-12 rounded-md overflow-hidden mr-3 mt-1 flex-shrink-0"
+              style={{
+                backgroundImage:
+                  courtType === "Singles"
+                    ? "url('/paddle3.jpg')"
+                    : "url('/paddle4.jpg')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            />
+            <div>
+              <p className="font-medium">{courtName}</p>
+              <p className="text-[#CCCCCC] text-sm">{courtType} Court</p>
+              <p className="text-[#E99E1B] font-bold">₹{price}</p>
+            </div>
           </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-[#191A24] to-[#4D789D] rounded-lg p-6 border-2 border-[#4D789D]">
+          <h2 className="text-xl font-bold mb-6">Personal Information</h2>
+          <form onSubmit={handleSubmit}>
+            <InputRow
+              icon={<User size={16} className="text-[#CCCCCC]" />}
+              id="name"
+              label="Full Name *"
+              value={formData.name}
+              onChange={onInput}
+              required
+            />
+            <InputRow
+              icon={<Mail size={16} className="text-[#CCCCCC]" />}
+              id="email"
+              type="email"
+              label="Email Address *"
+              value={formData.email}
+              onChange={onInput}
+              required
+            />
+            <InputRow
+              icon={<Phone size={16} className="text-[#CCCCCC]" />}
+              id="phone"
+              type="tel"
+              label="Phone Number *"
+              value={formData.phone}
+              onChange={onInput}
+              required
+            />
+
+            <h2 className="text-xl font-bold mb-4">Payment Method</h2>
+            <div className="mb-6">
+              <Radio
+                id="card"
+                name="paymentMethod"
+                value="card"
+                checked={formData.paymentMethod === "card"}
+                onChange={onInput}
+                icon={<CreditCard size={16} className="text-[#CCCCCC] mr-2" />}
+                label="Credit/Debit Card"
+              />
+              <Radio
+                id="cash"
+                name="paymentMethod"
+                value="cash"
+                checked={formData.paymentMethod === "cash"}
+                onChange={onInput}
+                label="Pay at Location"
+              />
+            </div>
+
+            <div className="mb-8">
+              <label className="flex items-start">
+                <input
+                  type="checkbox"
+                  id="agreeToTerms"
+                  name="agreeToTerms"
+                  checked={formData.agreeToTerms}
+                  onChange={onInput}
+                  required
+                  className="mt-1 mr-2 text-[#E99E1B] focus:ring-[#E99E1B]"
+                />
+                <span className="text-[#CCCCCC] text-sm">
+                  I agree to the booking terms and conditions, including the
+                  cancellation policy.
+                </span>
+              </label>
+            </div>
+
+            <motion.button
+              type="submit"
+              disabled={isSubmitting}
+              whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+              whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
+              className={`w-full py-3 rounded-lg font-medium flex justify-center items-center text-white ${
+                isSubmitting
+                  ? "bg-[#4D789D] cursor-not-allowed"
+                  : "bg-[#E99E1B] hover:bg-[#D68E13]"
+              }`}
+            >
+              {isSubmitting ? <Spinner /> : "Confirm Booking"}
+            </motion.button>
+          </form>
         </div>
       </div>
     </div>
   );
 }
-
-/* ---------- tiny presentational helpers ----------------------- */
 
 function InputRow({
   icon,
@@ -352,11 +324,11 @@ function InputRow({
 }) {
   return (
     <div className="mb-4">
-      <label htmlFor={id} className="block text-gray-300 mb-2">
+      <label htmlFor={id} className="block text-[#CCCCCC] mb-2">
         {label}
       </label>
       <div className="relative">
-        <span className="absolute left-3 top-3 text-gray-400">{icon}</span>
+        <span className="absolute left-3 top-3">{icon}</span>
         <input
           type={type}
           id={id}
@@ -365,8 +337,7 @@ function InputRow({
           onChange={onChange}
           required={required}
           placeholder={label.replace(" *", "")}
-          className="bg-gray-800 border border-gray-700 rounded-lg py-2 px-10 w-full
-                     text-white focus:border-green-500 focus:ring-1 focus:ring-green-500"
+          className="bg-gray-800 border border-gray-700 rounded-lg py-2 px-10 w-full text-white focus:ring-1 focus:ring-[#E99E1B] focus:border-[#E99E1B]"
         />
       </div>
     </div>
@@ -391,7 +362,7 @@ function Radio({
   icon?: React.ReactNode;
 }) {
   return (
-    <label className="flex items-center mb-3">
+    <label className="flex items-center mb-3 text-[#CCCCCC]">
       <input
         type="radio"
         id={id}
@@ -399,9 +370,9 @@ function Radio({
         value={value}
         checked={checked}
         onChange={onChange}
-        className="mr-2 text-green-500 focus:ring-green-500"
+        className="mr-2 text-[#E99E1B] focus:ring-[#E99E1B]"
       />
-      {icon && <span className="mr-2">{icon}</span>}
+      {icon}
       {label}
     </label>
   );

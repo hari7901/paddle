@@ -33,11 +33,11 @@ const BookingPreview = ({
       whileHover={{ y: -8 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className="group relative bg-gray-900 rounded-2xl overflow-hidden border border-green-800/30 shadow-xl hover:shadow-green-600/20"
+      className="group relative bg-[#191A24] rounded-2xl overflow-hidden border border-[#4D789D]/30 shadow-xl hover:shadow-[#4D789D]/20"
     >
       {/* Badge */}
       <div className="absolute top-4 left-4 z-20">
-        <div className="bg-green-600 text-white text-xs uppercase font-bold tracking-wider px-3 py-1 rounded-full">
+        <div className="bg-[#E99E1B] text-white text-xs uppercase font-bold tracking-wider px-3 py-1 rounded-full">
           {courtType}
         </div>
       </div>
@@ -53,31 +53,31 @@ const BookingPreview = ({
             className="w-full h-full bg-cover bg-center"
             style={{ backgroundImage: `url(${courtImage})` }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#191A24] via-transparent to-transparent" />
         </motion.div>
 
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <h3 className="text-white text-xl font-bold">{courtName}</h3>
           <div className="mt-1 flex items-center">
-            <span className="text-green-400 font-semibold text-lg">
+            <span className="text-[#E99E1B] font-semibold text-lg">
               ₹{price}
             </span>
-            <span className="text-gray-300 text-sm ml-1">per hour</span>
+            <span className="text-[#CCCCCC] text-sm ml-1">per hour</span>
           </div>
         </div>
       </div>
 
       {/* Court details */}
       <div className="p-5">
-        <div className="flex items-center text-gray-300 mb-3">
-          <Clock size={16} className="text-green-500 mr-2" />
+        <div className="flex items-center text-[#CCCCCC] mb-3">
+          <Clock size={16} className="text-[#4D789D] mr-2" />
           <span className="text-sm">Available 6:00 AM - 11:00 PM</span>
         </div>
 
         <div className="space-y-2 mb-5">
           {features.map((feature, index) => (
             <div key={index} className="flex items-start">
-              <div className="text-green-500 mr-2 mt-0.5">
+              <div className="text-[#4D789D] mr-2 mt-0.5">
                 <svg
                   width="12"
                   height="12"
@@ -94,7 +94,7 @@ const BookingPreview = ({
                   />
                 </svg>
               </div>
-              <span className="text-gray-300 text-sm">{feature}</span>
+              <span className="text-[#CCCCCC] text-sm">{feature}</span>
             </div>
           ))}
         </div>
@@ -103,7 +103,7 @@ const BookingPreview = ({
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center"
+            className="w-full bg-gradient-to-r from-[#E99E1B] to-[#D68E13] hover:from-[#D68E13] hover:to-[#C07B12] text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center"
           >
             <Calendar size={16} className="mr-2" />
             View Available Slots
@@ -113,7 +113,7 @@ const BookingPreview = ({
 
       {/* Overlay line animation */}
       <motion.div
-        className="absolute top-0 left-0 w-full h-1 bg-green-500"
+        className="absolute top-0 left-0 w-full h-1 bg-[#4D789D]"
         initial={{ scaleX: 0 }}
         animate={{ scaleX: isHovered ? 1 : 0 }}
         transition={{ duration: 0.3 }}
