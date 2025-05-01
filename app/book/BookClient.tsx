@@ -62,26 +62,26 @@ export default function BookClient() {
   const validate = () => {
     const errs = { name: "", email: "", phone: "", agreeToTerms: "" };
 
-    // Name validation
+    // Name
     if (!formData.name.trim()) {
       errs.name = "Name is required.";
     } else if (!/^[A-Za-z ]{3,}$/.test(formData.name.trim())) {
       errs.name = "Enter a valid name (min 3 letters).";
     }
 
-    // Email validation (must end @gmail.com)
+    // Email (@gmail.com)
     if (!formData.email.trim()) {
       errs.email = "Email is required.";
     } else if (!/^[^\s@]+@gmail\.com$/.test(formData.email.trim())) {
       errs.email = "Enter a valid @gmail.com address.";
     }
 
-    // Phone validation (10-digit local number)
+    // Phone (just local 10 digits)
     if (!/^[6-9]\d{9}$/.test(formData.localNumber)) {
       errs.phone = "Enter a valid 10-digit Indian mobile number.";
     }
 
-    // Terms checkbox
+    // Terms
     if (!formData.agreeToTerms) {
       errs.agreeToTerms = "You must accept the terms.";
     }
@@ -124,12 +124,16 @@ export default function BookClient() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create booking");
-      setBookingRef(data.data._id);
-      setUserEmail(formData.email.trim());
-      setBookingComplete(true);
+      if (!res.ok) {
+        // show the API error (including 409 slot clash)
+        alert(data.error || "Could not complete booking");
+      } else {
+        setBookingRef(data.data._id);
+        setUserEmail(formData.email.trim());
+        setBookingComplete(true);
+      }
     } catch {
-      alert("Could not complete booking — slot may be taken.");
+      alert("Network error — please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -187,7 +191,7 @@ export default function BookClient() {
           Fill in your details to confirm your reservation.
         </p>
 
-        {/* Summary */}
+        {/* Booking Summary */}
         <div className="bg-gradient-to-br from-[#191A24] to-[#4D789D] rounded-lg p-6 border-2 border-[#4D789D] mb-8">
           <h2 className="text-xl font-bold mb-4">Booking Summary</h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -222,7 +226,7 @@ export default function BookClient() {
           </div>
         </div>
 
-        {/* Form */}
+        {/* Personal Information Form */}
         <div className="bg-gradient-to-br from-[#191A24] to-[#4D789D] rounded-lg p-6 border-2 border-[#4D789D]">
           <h2 className="text-xl font-bold mb-6">Personal Information</h2>
           <form onSubmit={handleSubmit}>
@@ -333,6 +337,7 @@ export default function BookClient() {
   );
 }
 
+// Reusable input row component
 function InputRow({
   icon,
   id,
@@ -375,6 +380,7 @@ function InputRow({
   );
 }
 
+// Reusable radio component
 function Radio({
   id,
   name,
@@ -409,6 +415,7 @@ function Radio({
   );
 }
 
+// Spinner for loading state
 function Spinner() {
   return (
     <svg
