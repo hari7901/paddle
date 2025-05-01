@@ -1,3 +1,4 @@
+// app/api/bookings/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/app/lib/db";
 import Booking from "@/app/lib/models/Bookings";
@@ -87,6 +88,7 @@ export async function POST(req: NextRequest) {
       name,
       email,
       phone,
+      supportPhone: "+91 90410 13409",
     };
 
     await sendAdminNotification(params);
