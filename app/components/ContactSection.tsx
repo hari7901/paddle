@@ -5,7 +5,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Phone, Send, MapPin, Clock } from "lucide-react";
 
-const ContactSection = () => {
+export default function ContactSection() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,14 +26,22 @@ const ContactSection = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    setTimeout(() => {
-      console.log("Form submitted:", formData);
-      setIsSubmitting(false);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Submission failed");
       setSubmitSuccess(true);
       setFormData({ name: "", email: "", phone: "", message: "" });
       setTimeout(() => setSubmitSuccess(false), 5000);
-    }, 1500);
+    } catch (err) {
+      alert((err as Error).message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -91,11 +99,7 @@ const ContactSection = () => {
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.7,
-            type: "spring",
-            stiffness: 50,
-          }}
+          transition={{ duration: 0.7, type: "spring", stiffness: 50 }}
           viewport={{ once: true }}
           className="max-w-5xl mx-auto bg-gradient-to-br from-[#191A24] to-[#4D789D] rounded-xl shadow-2xl overflow-hidden border border-[#4D789D]"
         >
@@ -287,6 +291,4 @@ const ContactSection = () => {
       </div>
     </div>
   );
-};
-
-export default ContactSection;
+}

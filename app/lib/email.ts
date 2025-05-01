@@ -1,13 +1,10 @@
+// app/lib/email.ts
 import { SendMailClient, SendMailOptions } from "zeptomail";
 
 const mailClient = new SendMailClient({
-  url: process.env.ZEPTO_URL!,
-  token: process.env.ZEPTO_TOKEN!,
+  url: process.env.ZEPTO_URL!, // e.g. "https://api.zeptomail.in/"
+  token: process.env.ZEPTO_TOKEN!, // your Zoho-enczapikey token
 });
-
-export async function sendEmail(options: SendMailOptions) {
-  return mailClient.sendMail(options);
-}
 
 export interface BookingEmailParams {
   bookingId: string;
@@ -20,101 +17,105 @@ export interface BookingEmailParams {
   name: string;
   email: string;
   phone: string;
+  supportPhone: string;
 }
 
+// Send via ZeptoMail
+async function sendEmail(options: SendMailOptions) {
+  return mailClient.sendMail(options);
+}
+
+// Your public base URL for links (ensure NEXT_PUBLIC_BASE_URL is set)
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://proyard.in";
 
 function buildHtmlBody(isAdmin: boolean, params: BookingEmailParams) {
-  const { bookingId, courtName, courtType, date, times, slotIds, price, name } =
-    params;
+  const {
+    bookingId,
+    courtName,
+    courtType,
+    date,
+    times,
+    slotIds,
+    price,
+    name,
+    supportPhone,
+  } = params;
+  const formattedTimes = times.join(", ");
+  const formattedSlots = slotIds.join(", ");
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>${isAdmin ? "New Booking" : "Booking Confirmed"}</title>
+  <title>${
+    isAdmin ? "New Booking Notification" : "Booking Confirmation"
+  }</title>
   <style>
     body,table,td,a{ -webkit-text-size-adjust:100%;-ms-text-size-adjust:100%; }
     table{ border-collapse:collapse!important; }
     img{ border:0;height:auto;line-height:100%;outline:none;text-decoration:none;}
     body{ margin:0!important;padding:0!important;width:100%!important;background:#f4f4f7;}
     @media screen and (max-width:600px){
-      .responsive-table{ width:100%!important;}
-      .padding{ padding:10px!important;}
+      .container{ width:100%!important; }
+      .padding{ padding:10px!important; }
     }
   </style>
 </head>
-<body>
-  <table width="100%" bgcolor="#f4f4f7" cellpadding="0" cellspacing="0">
-    <tr><td align="center" style="padding:20px;">
-      <table class="responsive-table" width="600" bgcolor="#ffffff" cellpadding="0" cellspacing="0" style="border-radius:8px;overflow:hidden;">
-        
-        <!-- Title -->
-        <tr><td align="center" style="padding:30px 30px 20px;">
-          <h1 style="font-family:Helvetica,Arial,sans-serif;font-size:24px;color:#333;margin:0;">
-            ${isAdmin ? "🎯 New Booking Received" : "🎾 Booking Confirmed!"}
-          </h1>
-        </td></tr>
-        
-        <!-- Intro -->
-        <tr><td class="padding" style="padding:0 30px 20px;">
-          <p style="font-family:Helvetica,Arial,sans-serif;font-size:16px;color:#555;margin:0;">
-            ${
-              isAdmin
-                ? `A new booking was made on <strong>${date}</strong>.`
-                : `Hi <strong>${name}</strong>, your booking on <strong>${date}</strong> is confirmed!`
-            }
-          </p>
-        </td></tr>
-        
-        <!-- Details Table -->
-        <tr><td class="padding" style="padding:0 30px 30px;">
-          <table width="100%" cellpadding="0" cellspacing="0" style="font-family:Helvetica,Arial,sans-serif;color:#555;border:1px solid #e0e0e0;border-radius:4px;">
-            <tr style="background:#fafafa;">
-              <th align="left" style="padding:12px;border-bottom:1px solid #e0e0e0;">Court</th>
-              <td style="padding:12px;border-bottom:1px solid #e0e0e0;">${courtName} (${courtType})</td>
-            </tr>
-            <tr>
-              <th align="left" style="padding:12px;border-bottom:1px solid #e0e0e0;">Date & Time</th>
-              <td style="padding:12px;border-bottom:1px solid #e0e0e0;">${date}, ${times.join(
-    ", "
-  )}</td>
-            </tr>
-            <tr style="background:#fafafa;">
-              <th align="left" style="padding:12px;border-bottom:1px solid #e0e0e0;">Slots</th>
-              <td style="padding:12px;border-bottom:1px solid #e0e0e0;">${slotIds.join(
-                ", "
-              )}</td>
-            </tr>
-            <tr>
-              <th align="left" style="padding:12px;">Total Paid</th>
-              <td style="padding:12px;">₹${price}</td>
-            </tr>
-          </table>
-        </td></tr>
-        
-        <!-- Support / Admin link -->
-        <tr><td class="padding" style="padding:0 30px 30px;">
-          <p style="font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#888;margin:0;">
-            ${
-              isAdmin
-                ? `Admin dashboard: <a href="${baseUrl}/admin/bookings" style="color:#0070f3;">View All Bookings</a>`
-                : `For help, call <strong>+91 90410 13409</strong> or email <a href="mailto:proplaysports032@gmail.com">proplaysports032@gmail.com</a>.`
-            }
-          </p>
-        </td></tr>
-        
-      </table>
-    </td></tr>
-    
-    <!-- Disclaimer & Footer -->
-    <tr><td align="center" style="padding:20px;">
-      <p style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#aaa;margin:0;">
-        This is an auto-generated email; please do not reply.<br>
-        © 2025 Proyard Padel. All rights reserved.<br>
-        <a href="${baseUrl}/unsubscribe" style="color:#aaa;text-decoration:underline;">Unsubscribe</a>
-      </p>
-    </td></tr>
+<body style="background-color:#f4f4f7; margin:0; padding:20px;">
+  <table class="container" align="center" width="600" bgcolor="#ffffff" cellpadding="0" cellspacing="0" style="border-radius:8px;overflow:hidden;">
+    <tr>
+      <td style="padding:30px;">
+        <h1 style="font-family:Arial,sans-serif; color:#333; margin-top:0;">
+          ${isAdmin ? "🎯 New Booking Received" : "🎾 Booking Confirmed!"}
+        </h1>
+        <p style="font-family:Arial,sans-serif; color:#555;">
+          ${
+            isAdmin
+              ? `A new booking was made on <strong>${date}</strong>.`
+              : `Hi <strong>${name}</strong>, your booking on <strong>${date}</strong> is confirmed!`
+          }
+        </p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif; color:#555; border:1px solid #ddd; border-radius:4px; margin-top:20px;">
+          <tr style="background:#f9f9f9;">
+            <th align="left" style="padding:12px; border-bottom:1px solid #ddd;">Court</th>
+            <td style="padding:12px; border-bottom:1px solid #ddd;">${courtName} (${courtType})</td>
+          </tr>
+          <tr>
+            <th align="left" style="padding:12px; border-bottom:1px solid #ddd;">Date & Time</th>
+            <td style="padding:12px; border-bottom:1px solid #ddd;">${date}, ${formattedTimes}</td>
+          </tr>
+          <tr style="background:#f9f9f9;">
+            <th align="left" style="padding:12px; border-bottom:1px solid #ddd;">Slots</th>
+            <td style="padding:12px; border-bottom:1px solid #ddd;">${formattedSlots}</td>
+          </tr>
+          <tr>
+            <th align="left" style="padding:12px;">Total Paid</th>
+            <td style="padding:12px;">₹${price}</td>
+          </tr>
+        </table>
+
+        ${
+          !isAdmin
+            ? `
+        <p style="font-family:Arial,sans-serif; color:#555; margin-top:20px;">
+          For any questions, call us at <strong>${supportPhone}</strong>.
+        </p>
+        `
+            : `
+        <p style="font-family:Arial,sans-serif; color:#555; margin-top:20px;">
+          <a href="${baseUrl}/admin/bookings" style="color:#0070f3;">View all bookings</a>
+        </p>
+        `
+        }
+
+        <hr style="border:none; border-top:1px solid #eee; margin:30px 0;">
+
+        <p style="font-family:Arial,sans-serif; color:#999; font-size:12px; line-height:1.4;">
+          This is an auto-generated email; please do not reply.<br>
+          © 2025 Proyard Padel.
+        </p>
+      </td>
+    </tr>
   </table>
 </body>
 </html>`;
