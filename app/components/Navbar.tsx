@@ -26,9 +26,8 @@ const Navbar = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-[#191A24] shadow-md py-2" : "bg-[#191A24]/30 py-4"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300
+        ${isScrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"}`}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Logo */}
@@ -39,19 +38,17 @@ const Navbar = () => {
             transition={{ duration: 0.5 }}
             className="flex items-center"
           >
-            <div className="mr-2 rounded-full overflow-hidden bg-transparent">
-              <Image
-                src="/logo.svg"
-                alt="ProPlay Sports Logo"
-                width={150}
-                height={150}
-                className="block"
-              />
-            </div>
+            <Image
+              src="/logo.svg"
+              alt="ProPlay Sports Logo"
+              width={150}
+              height={150}
+              priority
+            />
           </motion.div>
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Desktop nav */}
         <nav className="hidden md:flex space-x-8">
           {navLinks.map((link, idx) => (
             <motion.div
@@ -62,7 +59,12 @@ const Navbar = () => {
             >
               <Link
                 href={link.href}
-                className="font-medium text-[#CCCCCC] hover:text-[#E99E1B] transition-colors"
+                className={`font-medium transition-colors
+                  ${
+                    isScrolled
+                      ? "text-black hover:text-[#E99E1B]"
+                      : "text-white hover:text-[#E99E1B]"
+                  }`}
               >
                 {link.name}
               </Link>
@@ -70,22 +72,24 @@ const Navbar = () => {
           ))}
         </nav>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile button */}
         <button
           className="md:hidden text-2xl"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          <span className="text-[#CCCCCC]">{isMobileMenuOpen ? "✕" : "☰"}</span>
+          <span className={isScrolled ? "text-black" : "text-white"}>
+            {isMobileMenuOpen ? "✕" : "☰"}
+          </span>
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile dropdown */}
       {isMobileMenuOpen && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
-          className="md:hidden bg-[#191A24] shadow-lg"
+          className="md:hidden bg-white shadow-lg"
         >
           <div className="container mx-auto px-4 py-4">
             {navLinks.map((link) => (
@@ -93,7 +97,7 @@ const Navbar = () => {
                 key={link.name}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block py-2 text-[#CCCCCC] hover:text-[#E99E1B] transition-colors"
+                className="block py-2 text-black hover:text-[#E99E1B] transition-colors"
               >
                 {link.name}
               </Link>

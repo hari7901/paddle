@@ -4,147 +4,104 @@
 import { motion } from "framer-motion";
 import { Award, Clock, Shield, Users } from "lucide-react";
 
-const AboutSection = () => {
+export default function AboutSection() {
+  /* ---------- feature data ---------- */
   const features = [
     {
-      icon: <Clock size={32} className="text-[#4D789D]" />,
+      icon: <Clock size={32} className="text-[#E99E1B]" />,
       title: "Extended Hours",
-      description:
-        "Open from 6:00 AM to 11:00 PM every day to accommodate your busy schedule.",
+      description: "Open from 6 AM – 11 PM every day for your schedule.",
     },
     {
-      icon: <Award size={32} className="text-[#4D789D]" />,
+      icon: <Award size={32} className="text-[#E99E1B]" />,
       title: "Premium Quality",
-      description:
-        "State-of-the-art courts designed to professional standards for the best playing experience.",
+      description: "Courts built to professional standards.",
     },
     {
-      icon: <Users size={32} className="text-[#4D789D]" />,
+      icon: <Users size={32} className="text-[#E99E1B]" />,
       title: "For Everyone",
-      description:
-        "Courts suitable for all skill levels, from beginners to advanced players.",
+      description: "Perfect for beginners through advanced players.",
     },
     {
-      icon: <Shield size={32} className="text-[#4D789D]" />,
+      icon: <Shield size={32} className="text-[#E99E1B]" />,
       title: "Safe Environment",
-      description:
-        "Regularly maintained facilities with appropriate safety measures in place.",
+      description: "Well-maintained facilities and safety measures.",
     },
   ];
 
-  // Animation variants
-  const containerVariants = {
+  /* ---------- framer variants ---------- */
+  const container = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
+    visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
   };
-
-  const itemVariants = {
+  const item = {
     hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: {
-        type: "spring",
-        damping: 12,
-        stiffness: 100,
-      },
+      transition: { type: "spring", stiffness: 100, damping: 12 },
     },
   };
-
-  const sectionVariants = {
+  const sectionV = {
     hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut",
-      },
-    },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
   };
 
+  /* ---------- render ---------- */
   return (
-    <div className="py-20 bg-gradient-to-br from-[#2E3D5A] to-[#5A8FC8] text-white relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#2E3D5A]/0 via-[#E99E1B] to-[#2E3D5A]/0"></div>
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#5A8FC8]/20 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#5A8FC8]/20 rounded-full blur-3xl"></div>
+    <section className="py-20 bg-white text-black relative overflow-hidden">
+      {/* accent & blobs */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#E99E1B] to-transparent" />
+      <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#E99E1B]/15 rounded-full blur-3xl" />
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#E99E1B]/15 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Section Header */}
+        {/* ---------- header ---------- */}
         <motion.div
+          variants={sectionV}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          variants={sectionVariants}
           className="text-center mb-16"
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            viewport={{ once: true }}
-            className="inline-block bg-[#191A24]/30 rounded-full px-4 py-1 mb-4"
-          >
-            <span className="text-[#E99E1B] text-sm font-semibold tracking-wider uppercase">
-              Our Journey
-            </span>
-          </motion.div>
+          <span className="inline-block bg-black/10 rounded-full px-4 py-1 mb-4 text-[#E99E1B] text-sm font-semibold uppercase tracking-wider">
+            Our Journey
+          </span>
 
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-bold mb-4"
-          >
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
             About ProPlay Sports
-          </motion.h2>
+          </h2>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            viewport={{ once: true }}
-            className="text-lg text-[#CCCCCC] max-w-2xl mx-auto"
-          >
-            We're dedicated to providing the best paddle court experience in the
-            city, with premium facilities and flexible booking options.
-          </motion.p>
+          <p className="text-lg text-black/70 max-w-2xl mx-auto">
+            Premium facilities • Flexible booking • Community spirit
+          </p>
         </motion.div>
 
-        {/* Story and Image Section */}
+        {/* ---------- story block (image + text) ---------- */}
         <motion.div
+          variants={sectionV}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          variants={sectionVariants}
           className="flex flex-col lg:flex-row items-center gap-12 mb-16"
         >
-          {/* Image */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, type: "spring", stiffness: 50 }}
             viewport={{ once: true }}
-            className="lg:w-1/2 w-full group mb-8 lg:mb-0"
+            className="lg:w-1/2 w-full"
           >
-            <div className="relative rounded-xl overflow-hidden shadow-2xl h-64 md:h-80 lg:h-96 w-full">
+            <div className="relative h-64 md:h-80 lg:h-96 w-full rounded-xl overflow-hidden shadow-xl group">
               <img
                 src="/paddle3.jpg"
                 alt="ProPlay Sports Court"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-black to-[#2E3D5A] opacity-50" />
+              <div className="absolute inset-0 bg-black/40" />
             </div>
           </motion.div>
 
-          {/* Story Text */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -153,129 +110,91 @@ const AboutSection = () => {
             className="lg:w-1/2 w-full"
           >
             <h3 className="text-2xl font-bold mb-4">Our Story</h3>
-            <p className="text-[#CCCCCC] mb-4">
-              ProPlay Sports was founded in 2022 by paddle enthusiasts
-              frustrated by the lack of quality courts in the city. Our mission
-              was simple: create a premium facility where players of all levels
-              could enjoy the sport they love in a welcoming environment.
+            <p className="text-black/75 mb-4">
+              Founded in 2022 by paddle enthusiasts, ProPlay Sports delivers a
+              top-tier playing experience for everyone.
             </p>
-            <p className="text-[#CCCCCC] mb-4">
-              Today, we're proud to offer two professional-grade courts - one
-              for singles play (₹1,200/hour) and one for doubles (₹1,600/hour) -
-              that meet the highest standards. Our courts are open to everyone,
-              whether you're a beginner or an experienced player.
-            </p>
-            <p className="text-[#CCCCCC]">
-              We believe paddle isn't just a sport – it's a community. We host
-              regular events, tournaments, and social gatherings to foster
-              camaraderie among our members.
+            <p className="text-black/75">
+              Today we operate two pro-grade courts (Singles ₹1 200/h, Doubles
+              ₹1 600/h) and host regular events that build community.
             </p>
           </motion.div>
         </motion.div>
 
-        {/* Features Grid */}
+        {/* ---------- feature grid (bg-white on ALL screens) ---------- */}
         <motion.div
-          variants={containerVariants}
+          variants={container}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 bg-white"
         >
-          {features.map((feature, index) => (
+          {features.map((f, i) => (
             <motion.div
-              key={index}
-              variants={itemVariants}
-              className="bg-[#191A24] rounded-lg p-6 text-center transition-transform duration-300 hover:scale-105 shadow-lg border-2 border-[#4D789D]"
+              key={i}
+              variants={item}
+              className="bg-white rounded-lg p-6 text-center border border-black/10
+                         shadow-sm hover:shadow-lg transition-transform hover:scale-105"
             >
-              <div className="flex justify-center mb-4 transition-transform duration-300 group-hover:rotate-12">
-                {feature.icon}
-              </div>
-              <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-              <p className="text-[#CCCCCC]">{feature.description}</p>
+              <div className="flex justify-center mb-4">{f.icon}</div>
+              <h3 className="text-xl font-bold mb-2">{f.title}</h3>
+              <p className="text-black/70">{f.description}</p>
             </motion.div>
           ))}
         </motion.div>
 
-        {/* Facilities and Why Choose Us Section */}
+        {/* ---------- facilities block ---------- */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, type: "spring", stiffness: 50 }}
           viewport={{ once: true }}
-          className="mt-20 bg-gradient-to-br from-[#191A24] to-[#4D789D] text-white p-10 rounded-lg border-2 border-[#4D789D] shadow-2xl relative overflow-hidden"
+          className="mt-20 bg-white text-black p-10 rounded-lg shadow-2xl relative overflow-hidden"
         >
-          {/* Subtle decorative overlay */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#2E3D5A]/0 via-[#E99E1B] to-[#2E3D5A]/0"></div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#E99E1B] to-transparent" />
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Our Facilities */}
+          <div className="grid md:grid-cols-2 gap-10">
+            {/* facilities list */}
             <div>
               <h3 className="text-2xl font-bold mb-4">Our Facilities</h3>
-              <p className="mb-4 text-[#CCCCCC]">
-                At ProPlay Sports, we offer two state-of-the-art paddle courts:
-              </p>
-              <ul className="space-y-4 text-[#CCCCCC]">
-                <li className="flex items-start group">
-                  <span className="text-[#4D789D] mr-2 transition-colors group-hover:text-[#E99E1B]">
-                    •
-                  </span>
+              <ul className="space-y-4 text-black/80">
+                <li className="flex items-start">
+                  <span className="text-[#E99E1B] mr-3">•</span>
                   <div>
-                    <span className="font-bold">Singles Court:</span>{" "}
-                    ₹1,200/hour
-                    <p className="mt-1 text-gray-400">
-                      Ideal for one-on-one matches with perfect dimensions.
-                    </p>
+                    <span className="font-bold">Singles Court:</span> ₹1
+                    200/hour
                   </div>
                 </li>
-                <li className="flex items-start group">
-                  <span className="text-[#4D789D] mr-2 transition-colors group-hover:text-[#E99E1B]">
-                    •
-                  </span>
+                <li className="flex items-start">
+                  <span className="text-[#E99E1B] mr-3">•</span>
                   <div>
-                    <span className="font-bold">Doubles Court:</span>{" "}
-                    ₹1,600/hour
-                    <p className="mt-1 text-gray-400">
-                      Spacious court designed for team play.
-                    </p>
+                    <span className="font-bold">Doubles Court:</span> ₹1
+                    600/hour
                   </div>
                 </li>
-                <li className="flex items-start group">
-                  <span className="text-[#4D789D] mr-2 transition-colors group-hover:text-[#E99E1B]">
-                    •
-                  </span>
+                <li className="flex items-start">
+                  <span className="text-[#E99E1B] mr-3">•</span>
                   <div>
-                    <span className="font-bold">Operating Hours:</span> 6 AM–11
-                    PM
-                    <p className="mt-1 text-gray-400">
-                      Extended hours with one-hour slots.
-                    </p>
+                    <span className="font-bold">Hours:</span> 6 AM – 11 PM
                   </div>
                 </li>
               </ul>
             </div>
 
-            {/* Why Choose Us */}
+            {/* why choose */}
             <div>
-              <h3 className="text-2xl font-bold mb-4">Why Choose Us</h3>
-              <ul className="space-y-3">
+              <h3 className="text-2xl text-black font-bold mb-4">Why Choose Us</h3>
+              <ul className="space-y-3 ">
                 {[
-                  "Professional-grade courts with premium surfaces",
-                  "24/7 online booking system",
-                  "Flexible scheduling in one-hour increments",
-                  "Clean, well-lit facilities",
-                  "Regular tournaments and social events",
-                  "Equipment rental available",
-                ].map((reason, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-start group transition-transform duration-300 hover:translate-x-2"
-                  >
-                    <span className="text-[#4D789D] mr-2 group-hover:text-[#E99E1B] transition-colors">
-                      ✓
-                    </span>
-                    <span className="text-[#CCCCCC] group-hover:text-white transition-colors">
-                      {reason}
-                    </span>
+                  "Pro surfaces & lighting",
+                  "24/7 online booking",
+                  "Flexible one-hour slots",
+                  "Clean, safe facilities",
+                  "Fun tournaments & socials",
+                ].map((r) => (
+                  <li key={r} className="flex items-start">
+                    <span className="text-[#E99E1B] mr-3">✓</span>
+                    <span className="text-black/80">{r}</span>
                   </li>
                 ))}
               </ul>
@@ -283,8 +202,6 @@ const AboutSection = () => {
           </div>
         </motion.div>
       </div>
-    </div>
+    </section>
   );
-};
-
-export default AboutSection;
+}

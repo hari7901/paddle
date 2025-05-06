@@ -1,4 +1,3 @@
-// app/components/BookingPreview.tsx
 "use client";
 
 import { motion } from "framer-motion";
@@ -15,15 +14,15 @@ interface BookingPreviewProps {
   features: string[];
 }
 
-const BookingPreview = ({
+export default function BookingPreview({
   courtId,
   courtName,
   courtType,
   courtImage,
   price,
   features,
-}: BookingPreviewProps) => {
-  const [isHovered, setIsHovered] = useState(false);
+}: BookingPreviewProps) {
+  const [hovered, setHovered] = useState(false);
 
   return (
     <motion.div
@@ -31,21 +30,22 @@ const BookingPreview = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       whileHover={{ y: -8 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      className="group relative bg-[#191A24] rounded-2xl overflow-hidden border border-[#4D789D]/30 shadow-xl hover:shadow-[#4D789D]/20"
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
+      className="group relative bg-black rounded-2xl overflow-hidden
+                 border border-white/10 shadow-lg hover:shadow-yellow-500/10"
     >
-      {/* Badge */}
-      <div className="absolute top-4 left-4 z-20">
-        <div className="bg-[#E99E1B] text-white text-xs uppercase font-bold tracking-wider px-3 py-1 rounded-full">
+      {/* badge */}
+      <div className="absolute top-4 left-4 z-10">
+        <span className="bg-[#E99E1B] text-black text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
           {courtType}
-        </div>
+        </span>
       </div>
 
-      {/* Image section */}
+      {/* image */}
       <div className="relative h-56 overflow-hidden">
         <motion.div
-          animate={{ scale: isHovered ? 1.05 : 1 }}
+          animate={{ scale: hovered ? 1.05 : 1 }}
           transition={{ duration: 0.6 }}
           className="absolute inset-0"
         >
@@ -53,74 +53,63 @@ const BookingPreview = ({
             className="w-full h-full bg-cover bg-center"
             style={{ backgroundImage: `url(${courtImage})` }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#191A24] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
         </motion.div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <h3 className="text-white text-xl font-bold">{courtName}</h3>
-          <div className="mt-1 flex items-center">
-            <span className="text-[#E99E1B] font-semibold text-lg">
+        {/* title & price (desktop only) */}
+        <div className="absolute bottom-0 inset-x-0 p-4 hidden md:block">
+          <h3 className="text-xl font-bold text-white">{courtName}</h3>
+          <div className="flex items-center mt-1">
+            <span className="font-semibold text-lg text-[#E99E1B]">
               ₹{price}
             </span>
-            <span className="text-[#CCCCCC] text-sm ml-1">per hour</span>
+            <span className="ml-1 text-sm text-white/70">per hour</span>
           </div>
         </div>
       </div>
 
-      {/* Court details */}
-      <div className="p-5">
-        <div className="flex items-center text-[#CCCCCC] mb-3">
-          <Clock size={16} className="text-[#4D789D] mr-2" />
-          <span className="text-sm">Available 6:00 AM - 11:00 PM</span>
+      {/* details block (desktop only) */}
+      <div className="p-5 hidden md:block">
+        <div className="flex items-center text-white/70 mb-3">
+          <Clock size={16} className="text-[#E99E1B] mr-2" />
+          <span className="text-sm">Available 6 AM – 11 PM</span>
         </div>
 
-        <div className="space-y-2 mb-5">
-          {features.map((feature, index) => (
-            <div key={index} className="flex items-start">
-              <div className="text-[#4D789D] mr-2 mt-0.5">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M10 3L4.5 8.5L2 6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-              <span className="text-[#CCCCCC] text-sm">{feature}</span>
-            </div>
+        <ul className="space-y-2 mb-6">
+          {features.map((f, i) => (
+            <li key={i} className="flex items-start">
+              <span className="text-[#E99E1B] mr-2 mt-0.5">✔</span>
+              <p className="text-sm text-white/80">{f}</p>
+            </li>
           ))}
-        </div>
+        </ul>
+      </div>
 
+      {/* CTA button – always visible */}
+      <div className="p-5 pt-4 md:pt-0">
         <Link href={`/book-slots?courtId=${courtId}`}>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full bg-gradient-to-r from-[#E99E1B] to-[#D68E13] hover:from-[#D68E13] hover:to-[#C07B12] text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center"
+            className="w-full bg-gradient-to-r from-[#E99E1B] to-[#FFC83D]
+                       hover:from-[#FFC83D] hover:to-[#E99E1B]
+                       text-black font-bold py-3 rounded-lg flex items-center
+                       justify-center transition-all"
           >
             <Calendar size={16} className="mr-2" />
-            View Available Slots
+            View Slots
           </motion.button>
         </Link>
       </div>
 
-      {/* Overlay line animation */}
+      {/* hover accent */}
       <motion.div
-        className="absolute top-0 left-0 w-full h-1 bg-[#4D789D]"
+        className="absolute top-0 left-0 h-1 w-full bg-[#E99E1B]"
         initial={{ scaleX: 0 }}
-        animate={{ scaleX: isHovered ? 1 : 0 }}
-        transition={{ duration: 0.3 }}
+        animate={{ scaleX: hovered ? 1 : 0 }}
+        transition={{ duration: 0.25 }}
         style={{ transformOrigin: "left" }}
       />
     </motion.div>
   );
-};
-
-export default BookingPreview;
+}
