@@ -100,11 +100,11 @@ export default function Footer() {
               <li className="flex items-start">
                 <MapPin size={20} className="mr-3 text-[##E99E1B]" />
                 <a
-                  href="https://maps.app.goo.gl/5QdYzyt2853gVvCS6?g_st=com.google.maps.preview.copy"
+                  href="https://maps.app.goo.gl/v345SW8RqBTa8pJG9?g_st=iw"
                   target="_blank"
                   className="text-black/70 hover:text-[##E99E1B] underline transition-colors"
                 >
-                  Ozmo Gym &amp; Spa — South City, Ludhiana
+                  Proyard Padel South City, Ludhiana
                 </a>
               </li>
               <li className="flex items-center">

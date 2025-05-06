@@ -4,6 +4,12 @@
 import { motion } from "framer-motion";
 import { MapPin } from "lucide-react";
 
+const CLICK_URL = "https://maps.app.goo.gl/v345SW8RqBTa8pJG9?g_st=iw";
+const EMBED_URL =
+  "https://maps.google.com/maps?q=" +
+  encodeURIComponent("Ozmo Gym & Spa – South City, Ludhiana") +
+  "&output=embed";
+
 export default function AddressMapSection() {
   return (
     <section
@@ -25,7 +31,7 @@ export default function AddressMapSection() {
         className="max-w-5xl mx-auto rounded-xl shadow-xl overflow-hidden border border-black/10"
       >
         <div className="md:flex">
-          {/* ───── address panel (now white) ───── */}
+          {/* address panel */}
           <div className="md:w-1/2 p-8 bg-white relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#E99E1B] to-transparent" />
             <h3 className="text-2xl font-bold mb-6">Our Location</h3>
@@ -33,24 +39,24 @@ export default function AddressMapSection() {
             <div className="flex items-start">
               <MapPin size={24} className="text-[#E99E1B] mt-1 mr-3" />
               <a
-                href="https://maps.app.goo.gl/5QdYzyt2853gVvCS6?g_st=com.google.maps.preview.copy"
+                href={CLICK_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-black/80 hover:text-[#E99E1B] underline transition-colors"
+                className="underline text-black/80 hover:text-[#E99E1B] transition-colors"
               >
-                Ozmo Gym &amp; Spa – South City, Ludhiana
+                Proyard Padel South City, Ludhiana
               </a>
             </div>
           </div>
 
-          {/* ───── map panel (also white) ───── */}
+          {/* map preview */}
           <div className="md:w-1/2 p-8 bg-white">
             <div className="h-64 md:h-full">
               <iframe
                 title="Ozmo Gym & Spa Location"
-                src="https://maps.google.com/maps?q=Ozmo%20Gym%20%26%20Spa%20South%20City%20Ludhiana&output=embed"
-                className="w-full h-full rounded-lg border-0"
+                src={EMBED_URL}
                 loading="lazy"
+                className="w-full h-full border-0 rounded-lg"
               />
             </div>
           </div>

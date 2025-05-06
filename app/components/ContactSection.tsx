@@ -53,7 +53,7 @@ export default function ContactSection() {
       id="contact"
       className="py-20 bg-white text-black relative overflow-hidden"
     >
-      {/* yellow accent line + blobs */}
+      {/* accent line + soft blobs */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#E99E1B] to-transparent" />
       <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#E99E1B]/15 rounded-full blur-3xl" />
       <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#E99E1B]/15 rounded-full blur-3xl" />
@@ -67,7 +67,7 @@ export default function ContactSection() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <span className="inline-block bg-black/10 rounded-full px-4 py-1 mb-4 text-[##E99E1B] text-sm font-semibold uppercase tracking-wider">
+          <span className="inline-block bg-black/10 rounded-full px-4 py-1 mb-4 text-[#E99E1B] text-sm font-semibold uppercase tracking-wider">
             Get in Touch
           </span>
 
@@ -87,7 +87,7 @@ export default function ContactSection() {
           className="max-w-5xl mx-auto rounded-xl shadow-xl overflow-hidden border border-black/10 bg-white"
         >
           <div className="md:flex">
-            {/* -------- info pane (black) -------- */}
+            {/* -------- info pane -------- */}
             <div className="md:w-1/3 bg-black text-white p-8 relative">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#E99E1B] to-transparent" />
               <h3 className="text-2xl font-bold mb-6">Get in Touch</h3>
@@ -100,6 +100,11 @@ export default function ContactSection() {
                     value: "+91 90410 13409",
                   },
                   {
+                    icon: Phone,
+                    label: "Phone (alt)",
+                    value: "+91 98551 77676",
+                  },
+                  {
                     icon: Mail,
                     label: "Email",
                     value: "proplaysports032@gmail.com",
@@ -107,13 +112,13 @@ export default function ContactSection() {
                   {
                     icon: MapPin,
                     label: "Address",
-                    value: "Ozmo Gym & Spa – South City, Ludhiana",
+                    value: "Proyard Padel South City, Ludhiana",
                     link: "https://maps.app.goo.gl/5QdYzyt2853gVvCS6?g_st=com.google.maps.preview.copy",
                   },
                   {
                     icon: Clock,
                     label: "Business Hours",
-                    value: "Mon–Fri 9 AM–9 PM • Sat–Sun 8 AM–8 PM",
+                    value: "Mon–Sun 6 AM–10 PM",
                   },
                 ].map(({ icon: Icon, label, value, link }) => (
                   <li key={label} className="group">
