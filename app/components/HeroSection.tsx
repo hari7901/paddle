@@ -9,7 +9,7 @@ const slides = [
   {
     id: 1,
     title: "Single Court",
-    description: "Perfect for intense one-on-one matches",
+    description: "Perfect for intense one‑on‑one matches",
     buttonText: "Book Single Court",
     image: "/paddle3.jpg",
     courtId: "court-1",
@@ -27,7 +27,7 @@ const slides = [
 export default function HeroSection() {
   const [current, setCurrent] = useState(0);
 
-  /* auto-advance */
+  /* auto‑advance */
   useEffect(() => {
     const iv = setInterval(
       () => setCurrent((p) => (p + 1 === slides.length ? 0 : p + 1)),
@@ -36,7 +36,7 @@ export default function HeroSection() {
     return () => clearInterval(iv);
   }, []);
 
-  /* ■■■ Guard against undefined slide ■■■ */
+  /* Guard in case */
   const slide = slides[current] ?? slides[0];
 
   /* framer helpers */
@@ -55,11 +55,14 @@ export default function HeroSection() {
 
   return (
     <section className="w-full relative overflow-hidden h-auto md:h-screen">
-      <div className="flex flex-col md:flex-row h-full">
-        {/* LEFT */}
+      {/* mobile: image first, text below; desktop: row */}
+      <div className="flex flex-col-reverse md:flex-row h-full">
+        {/* TEXT */}
         <div
           className="w-full md:w-1/2 bg-white flex flex-col items-center md:items-start
-                        justify-start md:justify-center px-6 sm:px-8 lg:px-16 pt-32 pb-24 md:pt-0 md:pb-0"
+                     justify-start md:justify-center px-6 sm:px-8 lg:px-16
+                     pt-12 pb-20                       /* ↓ tighter mobile spacing  */
+                     md:pt-0 md:pb-0"
         >
           <AnimatePresence mode="wait">
             <motion.div
@@ -107,7 +110,7 @@ export default function HeroSection() {
           </AnimatePresence>
         </div>
 
-        {/* RIGHT */}
+        {/* IMAGE */}
         <div className="w-full md:w-1/2 h-64 md:h-full relative">
           {slides.map((s, i) => (
             <motion.div

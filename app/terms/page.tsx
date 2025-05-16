@@ -13,13 +13,14 @@ export default function TermsOfServicePage() {
         <h1 className="text-4xl font-bold mb-6">Terms of Service</h1>
 
         <p className="mb-6 text-[#CCCCCC]">
-          Last updated: April 28, 2025
+          Last updated: April&nbsp;28,&nbsp;2025
           <br />
           These Terms of Service (“Terms”) govern your use of the Proyard Padel
           website and booking service. No account or login is required—just pick
           your court and time.
         </p>
 
+        {/* 1–11 remain the same */}
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">
             1. Acceptance of Terms
@@ -49,10 +50,7 @@ export default function TermsOfServicePage() {
               Payment is collected at the time of booking. Prices are in INR
               (₹).
             </li>
-            <li>
-              We do not require any account—simply enter your details to
-              complete the booking.
-            </li>
+            <li>No account is required—simply enter your details to book.</li>
           </ul>
         </section>
 
@@ -61,8 +59,8 @@ export default function TermsOfServicePage() {
             4. Cancellation Policy
           </h2>
           <p className="text-[#CCCCCC]">
-            Cancel up to 24 hours before your slot for a full refund.
-            Cancellations within 24 hours are non-refundable.
+            Cancel up to 24 hours before your slot for a full refund.
+            Cancellations within 24 hours are non‑refundable.
           </p>
         </section>
 
@@ -112,11 +110,11 @@ export default function TermsOfServicePage() {
           </p>
         </section>
 
-        <section className="mb-12">
+        <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">10. Changes to Terms</h2>
           <p className="text-[#CCCCCC]">
-            We may update these Terms. Changes take effect when posted.
-            Continuing to use the Service means you accept changes.
+            We may update these Terms at any time. Continued use of the Service
+            signifies acceptance of the revised Terms.
           </p>
         </section>
 
@@ -125,7 +123,7 @@ export default function TermsOfServicePage() {
           <p className="text-[#CCCCCC]">Questions about these Terms?</p>
           <ul className="list-disc list-inside text-[#CCCCCC] mt-4 space-y-2">
             <li>
-              Email:{" "}
+              Email:&nbsp;
               <a
                 href="mailto:proplaysports032@gmail.com"
                 className="text-[#E99E1B] hover:underline"
@@ -134,26 +132,34 @@ export default function TermsOfServicePage() {
               </a>
             </li>
             <li>
-              Phone:{" "}
+              Phone:&nbsp;
               <a
                 href="tel:+919041013409"
                 className="text-[#E99E1B] hover:underline"
               >
-                +91 90410 13409
+                +91&nbsp;90410&nbsp;13409
               </a>
             </li>
             <li>
-              Address:{" "}
+              Address:&nbsp;
               <a
                 href="https://maps.app.goo.gl/5QdYzyt2853gVvCS6?g_st=com.google.maps.preview.copy"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#E99E1B] hover:underline"
               >
-                Ozmo Gym & Spa – South City, Ludhiana
+                Ozmo&nbsp;Gym&nbsp;&amp;&nbsp;Spa – South&nbsp;City, Ludhiana
               </a>
             </li>
           </ul>
+        </section>
+
+        {/* ───── NEW SECTION ───── */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">12. No Refund Policy</h2>
+          <p className="text-[#CCCCCC]">
+            We do not entertain any refunds; all bookings are final.
+          </p>
         </section>
       </div>
     </main>

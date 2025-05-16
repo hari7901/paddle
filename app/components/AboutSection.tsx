@@ -2,34 +2,80 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Award, Clock, Shield, Users } from "lucide-react";
+import {
+  Award,
+  Clock,
+  Shield,
+  Users,
+  Instagram,
+  Coffee,
+  MapPin,
+  Trophy,
+  Flame,
+  Sparkles,
+  CircleDot,
+} from "lucide-react";
 
 export default function AboutSection() {
-  /* ---------- feature data ---------- */
+  /* ──────────────────────────────────────────
+     1. Feature grid (top of section)
+  ────────────────────────────────────────── */
   const features = [
     {
       icon: <Clock size={32} className="text-[#E99E1B]" />,
       title: "Extended Hours",
-      description: "Open from 6 AM – 11 PM every day for your schedule.",
+      description: "Open 6 AM – 11 PM every day.",
     },
     {
       icon: <Award size={32} className="text-[#E99E1B]" />,
-      title: "Premium Quality",
-      description: "Courts built to professional standards.",
+      title: "European Standard",
+      description: "Pro‑grade courts & lighting.",
     },
     {
       icon: <Users size={32} className="text-[#E99E1B]" />,
       title: "For Everyone",
-      description: "Perfect for beginners through advanced players.",
+      description: "Beginners to advanced players.",
     },
     {
       icon: <Shield size={32} className="text-[#E99E1B]" />,
-      title: "Safe Environment",
-      description: "Well-maintained facilities and safety measures.",
+      title: "Safe & Clean",
+      description: "Well‑maintained facilities.",
     },
   ];
 
-  /* ---------- framer variants ---------- */
+  /* ──────────────────────────────────────────
+     2. PROYARD highlight cards (bottom)
+  ────────────────────────────────────────── */
+  const highlights = [
+    {
+      icon: <CircleDot size={28} className="text-[#E99E1B]" />,
+      text: "2 Premium Courts – singles & doubles",
+    },
+    {
+      icon: <Coffee size={28} className="text-[#E99E1B]" />,
+      text: "Stylish café with outdoor seating",
+    },
+    {
+      icon: <Sparkles size={28} className="text-[#E99E1B]" />,
+      text: "First‑of‑its‑kind in Ludhiana",
+    },
+    {
+      icon: <Trophy size={28} className="text-[#E99E1B]" />,
+      text: "Perfect for players, families & friends",
+    },
+    {
+      icon: <Flame size={28} className="text-[#E99E1B]" />,
+      text: "Events, coaching & community fun",
+    },
+    {
+      icon: <MapPin size={28} className="text-[#E99E1B]" />,
+      text: "Located in the heart of Ludhiana",
+    },
+  ];
+
+  /* ──────────────────────────────────────────
+     3. Framer‑motion helpers
+  ────────────────────────────────────────── */
   const container = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
@@ -47,16 +93,18 @@ export default function AboutSection() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
   };
 
-  /* ---------- render ---------- */
+  /* ──────────────────────────────────────────
+     4. Render
+  ────────────────────────────────────────── */
   return (
     <section className="py-20 bg-white text-black relative overflow-hidden">
-      {/* accent & blobs */}
+      {/* decorative blobs & accent line */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#E99E1B] to-transparent" />
       <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#E99E1B]/15 rounded-full blur-3xl" />
       <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#E99E1B]/15 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* ---------- header ---------- */}
+        {/* ───── Header ───── */}
         <motion.div
           variants={sectionV}
           initial="hidden"
@@ -77,7 +125,7 @@ export default function AboutSection() {
           </p>
         </motion.div>
 
-        {/* ---------- story block (image + text) ---------- */}
+        {/* ───── Story block (image + NEW copy) ───── */}
         <motion.div
           variants={sectionV}
           initial="hidden"
@@ -85,6 +133,7 @@ export default function AboutSection() {
           viewport={{ once: true }}
           className="flex flex-col lg:flex-row items-center gap-12 mb-16"
         >
+          {/* image */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -102,6 +151,7 @@ export default function AboutSection() {
             </div>
           </motion.div>
 
+          {/* NEW copy */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -109,25 +159,64 @@ export default function AboutSection() {
             viewport={{ once: true }}
             className="lg:w-1/2 w-full"
           >
-            <h3 className="text-2xl font-bold mb-4">Our Story</h3>
+            <h3 className="text-2xl md:text-3xl font-bold mb-4">
+              PROYARD – Ludhiana’s First European‑Standard Padel Experience!
+            </h3>
+
+            <ul className="space-y-3 text-black/80 mb-6">
+              <li className="flex items-start">
+                <CircleDot className="text-[#E99E1B] mr-2" size={20} />2 Premium
+                Courts – singles & doubles
+              </li>
+              <li className="flex items-start">
+                <Coffee className="text-[#E99E1B] mr-2" size={20} />
+                Stylish Café with outdoor seating – chill, chat, or refuel
+                post‑game
+              </li>
+            </ul>
+
             <p className="text-black/75 mb-4">
-              Founded in 2022 by paddle enthusiasts, ProPlay Sports delivers a
-              top-tier playing experience for everyone.
+              Be part of the padel revolution! PROYARD brings
+              international‑grade courts, vibrant energy, and a relaxed social
+              vibe — all in one stunning outdoor space. Whether you're here to
+              compete or just connect, this is Ludhiana’s go‑to spot for sport
+              and lifestyle.
             </p>
+
+            <ul className="space-y-3 text-black/80 mb-6">
+              <li className="flex items-start">
+                <Sparkles className="text-[#E99E1B] mr-2" size={20} />
+                First‑of‑its‑kind in the city
+              </li>
+              <li className="flex items-start">
+                <Trophy className="text-[#E99E1B] mr-2" size={20} />
+                Perfect for players, families & friends
+              </li>
+              <li className="flex items-start">
+                <Flame className="text-[#E99E1B] mr-2" size={20} />
+                Events, coaching & community fun
+              </li>
+            </ul>
+
             <p className="text-black/75">
-              Today we operate two pro-grade courts (Singles ₹1 200/h, Doubles
-              ₹1 600/h) and host regular events that build community.
+              👉 Book your court now – Let the game begin!
+              <br />
+              📍 Located in the heart of Ludhiana
             </p>
+            <div className="mt-4 flex items-center">
+              <Instagram size={20} className="text-[#E99E1B] mr-1" />
+              <span className="text-black/80">@proyard_ldh</span>
+            </div>
           </motion.div>
         </motion.div>
 
-        {/* ---------- feature grid (bg-white on ALL screens) ---------- */}
+        {/* ───── Feature grid ───── */}
         <motion.div
           variants={container}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 bg-white"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
         >
           {features.map((f, i) => (
             <motion.div
@@ -143,7 +232,7 @@ export default function AboutSection() {
           ))}
         </motion.div>
 
-        {/* ---------- facilities block ---------- */}
+        {/* ───── Facilities block ───── */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -154,41 +243,39 @@ export default function AboutSection() {
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#E99E1B] to-transparent" />
 
           <div className="grid md:grid-cols-2 gap-10">
-            {/* facilities list */}
             <div>
               <h3 className="text-2xl font-bold mb-4">Our Facilities</h3>
               <ul className="space-y-4 text-black/80">
                 <li className="flex items-start">
                   <span className="text-[#E99E1B] mr-3">•</span>
                   <div>
-                    <span className="font-bold">Singles Court:</span> ₹1
-                    200/hour
+                    <span className="font-bold">Singles Court:</span>{" "}
+                    ₹1 200/hour
                   </div>
                 </li>
                 <li className="flex items-start">
                   <span className="text-[#E99E1B] mr-3">•</span>
                   <div>
-                    <span className="font-bold">Doubles Court:</span> ₹1
-                    600/hour
+                    <span className="font-bold">Doubles Court:</span>{" "}
+                    ₹1 600/hour
                   </div>
                 </li>
                 <li className="flex items-start">
                   <span className="text-[#E99E1B] mr-3">•</span>
                   <div>
-                    <span className="font-bold">Hours:</span> 6 AM – 11 PM
+                    <span className="font-bold">Hours:</span> 6 AM – 11 PM
                   </div>
                 </li>
               </ul>
             </div>
 
-            {/* why choose */}
             <div>
-              <h3 className="text-2xl text-black font-bold mb-4">Why Choose Us</h3>
-              <ul className="space-y-3 ">
+              <h3 className="text-2xl font-bold mb-4">Why Choose Us</h3>
+              <ul className="space-y-3">
                 {[
                   "Pro surfaces & lighting",
                   "24/7 online booking",
-                  "Flexible one-hour slots",
+                  "Flexible one‑hour slots",
                   "Clean, safe facilities",
                   "Fun tournaments & socials",
                 ].map((r) => (

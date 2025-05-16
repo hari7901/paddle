@@ -44,9 +44,8 @@ export default function CancellationPolicy() {
             Exceptions (Force Majeure)
           </h3>
           <p className="text-black/80">
-            In the unlikely event that&nbsp;
-            <strong>Proyard Padel</strong> must cancel your booking for reasons
-            beyond our control (e.g.&nbsp;government-mandated shutdown, severe
+            In the unlikely event that&nbsp; must cancel your booking for reasons
+            beyond our c ontrol (e.g.&nbsp;government-mandated shutdown, severe
             weather that renders play unsafe, or court maintenance emergencies),
             we will offer either:
           </p>
@@ -54,7 +53,7 @@ export default function CancellationPolicy() {
             <li>
               a free reschedule to an available slot of your choice, <em>or</em>
             </li>
-            <li>a full refund to your original payment method.</li>
+            <li>A full refund will be credited within 7-8 days to your original payment method</li>
           </ul>
 
           <h3 className="text-xl font-semibold mt-8 mb-3">Need Help?</h3>
