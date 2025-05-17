@@ -74,7 +74,19 @@ export default function BookSlotsClient() {
     fetch(`/api/slots?courtId=${courtId}&date=${date}`, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((data: Slot[]) => {
-        setSlots(data);
+        // Filter slots to only show between 4 PM (16:00) and 11 PM (23:00)
+        const filteredSlots = data.filter((slot) => {
+          // Extract the hour from the time string
+          const hourMatch = slot.time.match(/^(\d+):00/);
+          if (!hourMatch) return false;
+
+          const hour = parseInt(hourMatch[1], 10);
+          // We want to keep slots starting at 16:00 through 22:00
+          // (16:00 is 4 PM, 22:00 is 10 PM which ends at 11 PM)
+          return hour >= 16 && hour <= 22;
+        });
+
+        setSlots(filteredSlots);
         setSelected([]);
       })
       .catch((e) => {
