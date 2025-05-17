@@ -1,4 +1,3 @@
-// app/book/book.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,7 +7,6 @@ import { motion } from "framer-motion";
 import {
   Calendar,
   Clock,
-  CreditCard,
   Check,
   ArrowLeft,
   User,
@@ -41,7 +39,7 @@ export default function BookClient() {
     name: "",
     email: "",
     localNumber: "",
-    paymentMethod: "card" as "card" | "cash",
+    paymentMethod: "cash", // Default to cash payment only
     agreeToTerms: false,
   });
 
@@ -116,7 +114,7 @@ export default function BookClient() {
           name: formData.name.trim(),
           email: formData.email.trim(),
           phone,
-          paymentMethod: formData.paymentMethod,
+          paymentMethod: "cash", // Always send cash as payment method
         }),
       });
       const data = await res.json();
@@ -173,7 +171,7 @@ export default function BookClient() {
             </div>
             <Link
               href="/"
-              className="inline-block bg-[##E99E1B] hover:bg-[#CF8A17] text-black font-semibold px-6 py-3 rounded-lg"
+              className="inline-block bg-[#E99E1B] hover:bg-[#CF8A17] text-black font-semibold px-6 py-3 rounded-lg"
             >
               Return Home
             </Link>
@@ -191,7 +189,7 @@ export default function BookClient() {
         {/* back link */}
         <Link
           href={`/book-slots?courtId=${courtId}`}
-          className="inline-flex items-center text-black/60 hover:text-[##E99E1B] mb-6"
+          className="inline-flex items-center text-black/60 hover:text-[#E99E1B] mb-6"
         >
           <ArrowLeft size={16} className="mr-2" /> Back to Time Slots
         </Link>
@@ -206,12 +204,12 @@ export default function BookClient() {
           <h2 className="text-xl font-bold mb-4">Booking Summary</h2>
           <div className="grid md:grid-cols-2 gap-4 text-black/80">
             <div className="flex items-center">
-              <Calendar size={18} className="text-[##E99E1B] mr-2" />
+              <Calendar size={18} className="text-[#E99E1B] mr-2" />
               <span className="mr-2">Date:</span>
               <span className="font-medium">{formatDate(date)}</span>
             </div>
             <div className="flex items-center">
-              <Clock size={18} className="text-[##E99E1B] mr-2" />
+              <Clock size={18} className="text-[#E99E1B] mr-2" />
               <span className="mr-2">Time:</span>
               <span className="font-medium">{times.join(" | ")}</span>
             </div>
@@ -232,7 +230,7 @@ export default function BookClient() {
             <div>
               <p className="font-medium">{courtName}</p>
               <p className="text-black/70 text-sm">{courtType} Court</p>
-              <p className="text-[##E99E1B] font-bold">₹{price}</p>
+              <p className="text-[#E99E1B] font-bold">₹{price}</p>
             </div>
           </div>
         </div>
@@ -277,35 +275,33 @@ export default function BookClient() {
                   onChange={onInput}
                   placeholder="XXXXXXXXXX"
                   className="flex-1 bg-white border border-black/10 rounded-r-lg px-3 py-2
-                             focus:ring-1 focus:ring-[##E99E1B] focus:border-[##E99E1B]"
+                             focus:ring-1 focus:ring-[#E99E1B] focus:border-[#E99E1B]"
                   required
                 />
               </div>
               {errors.phone && (
-                <p className="text-[##FF6B6B] text-sm mt-1">{errors.phone}</p>
+                <p className="text-[#FF6B6B] text-sm mt-1">{errors.phone}</p>
               )}
             </div>
 
             {/* payment */}
             <h2 className="text-xl font-bold mb-4">Payment Method</h2>
             <div className="mb-6">
-              <Radio
-                id="card"
-                name="paymentMethod"
-                value="card"
-                checked={formData.paymentMethod === "card"}
-                onChange={onInput}
-                label="Credit/Debit Card"
-                icon={<CreditCard size={16} className="mr-2 text-black/60" />}
-              />
-              <Radio
-                id="cash"
-                name="paymentMethod"
-                value="cash"
-                checked={formData.paymentMethod === "cash"}
-                onChange={onInput}
-                label="Pay at Location"
-              />
+              <div className="flex items-center mb-3">
+                <input
+                  type="radio"
+                  id="cash"
+                  name="paymentMethod"
+                  value="cash"
+                  checked={true}
+                  readOnly
+                  className="mr-2 text-[#E99E1B] focus:ring-[#E99E1B]"
+                />
+                <span>Pay at Location</span>
+              </div>
+              <p className="text-black/70 text-sm pl-6">
+                Please pay in full at the venue before your scheduled time slot.
+              </p>
             </div>
 
             {/* terms */}
@@ -317,7 +313,7 @@ export default function BookClient() {
                   name="agreeToTerms"
                   checked={formData.agreeToTerms}
                   onChange={onInput}
-                  className="mt-1 mr-2 text-[##E99E1B] focus:ring-[##E99E1B]"
+                  className="mt-1 mr-2 text-[#E99E1B] focus:ring-[#E99E1B]"
                 />
                 <span className="text-black/70 text-sm">
                   I agree to the booking terms and conditions, including the
@@ -325,7 +321,7 @@ export default function BookClient() {
                 </span>
               </label>
               {errors.agreeToTerms && (
-                <p className="text-[##FF6B6B] text-sm mt-1">
+                <p className="text-[#FF6B6B] text-sm mt-1">
                   {errors.agreeToTerms}
                 </p>
               )}
@@ -341,7 +337,7 @@ export default function BookClient() {
                 ${
                   isSubmitting
                     ? "bg-black/40"
-                    : "bg-[##E99E1B] hover:bg-[#CF8A17]"
+                    : "bg-[#E99E1B] hover:bg-[#CF8A17]"
                 }`}
             >
               {isSubmitting ? <Spinner /> : "Confirm Booking"}
@@ -389,45 +385,11 @@ function InputRow({
           required={required}
           placeholder={label.replace(" *", "")}
           className="w-full bg-white border border-black/10 rounded-lg py-2 pl-10 pr-3
-                     focus:ring-1 focus:ring-[##E99E1B] focus:border-[##E99E1B]"
+                     focus:ring-1 focus:ring-[#E99E1B] focus:border-[#E99E1B]"
         />
       </div>
-      {error && <p className="text-[##FF6B6B] text-sm mt-1">{error}</p>}
+      {error && <p className="text-[#FF6B6B] text-sm mt-1">{error}</p>}
     </div>
-  );
-}
-
-function Radio({
-  id,
-  name,
-  value,
-  checked,
-  onChange,
-  label,
-  icon,
-}: {
-  id: string;
-  name: string;
-  value: string;
-  checked: boolean;
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
-  label: string;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <label className="flex items-center mb-3">
-      <input
-        type="radio"
-        id={id}
-        name={name}
-        value={value}
-        checked={checked}
-        onChange={onChange}
-        className="mr-2 text-[##E99E1B] focus:ring-[##E99E1B]"
-      />
-      {icon}
-      {label}
-    </label>
   );
 }
 
