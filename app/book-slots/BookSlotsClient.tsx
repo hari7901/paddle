@@ -1,4 +1,3 @@
-// app/book-slots/BookSlotsClient.tsx
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -132,14 +131,14 @@ export default function BookSlotsClient() {
         <div className="flex flex-wrap gap-4 mb-8">
           <Link
             href="/"
-            className="inline-flex items-center bg-[##E99E1B] hover:bg-[#CF8A17] text-black font-semibold px-5 py-2 rounded-lg"
+            className="inline-flex items-center bg-[#E99E1B] hover:bg-[#CF8A17] text-black font-semibold px-5 py-2 rounded-lg"
           >
             <ArrowLeft size={16} className="mr-2" />
             Home
           </Link>
           <Link
             href={`/book-slots?courtId=${otherCourtId}`}
-            className="inline-flex items-center bg-[##E99E1B] hover:bg-[#CF8A17] text-black font-semibold px-5 py-2 rounded-lg"
+            className="inline-flex items-center bg-[#E99E1B] hover:bg-[#CF8A17] text-black font-semibold px-5 py-2 rounded-lg"
           >
             {court.type === "Singles" ? "Doubles Court" : "Singles Court"} Slots
           </Link>
@@ -162,8 +161,8 @@ export default function BookSlotsClient() {
                   onClick={() => setDate(d.value)}
                   className={`px-4 py-3 border rounded-lg mr-2 whitespace-nowrap ${
                     d.value === date
-                      ? "bg-[##E99E1B] border-[##E99E1B] text-black"
-                      : "border-black/20 hover:border-[##E99E1B] text-black/70"
+                      ? "bg-[#E99E1B] border-[#E99E1B] text-black"
+                      : "border-black/20 hover:border-[#E99E1B] text-black/70"
                   }`}
                 >
                   {d.label}
@@ -181,7 +180,7 @@ export default function BookSlotsClient() {
             </h3>
             <span className="text-sm text-black/60 flex items-center">
               <Clock size={16} className="mr-2" />{" "}
-              6&nbsp;AM&nbsp;–&nbsp;11&nbsp;PM
+              4&nbsp;PM&nbsp;–&nbsp;11&nbsp;PM
             </span>
           </div>
 
@@ -218,7 +217,7 @@ export default function BookSlotsClient() {
                       whileTap={{ scale: 0.95 }}
                       className={
                         isSel
-                          ? `${base} bg-[##E99E1B] border-[##E99E1B] text-black`
+                          ? `${base} bg-[#E99E1B] border-[#E99E1B] text-black`
                           : `${base} bg-black/5 border-black/10 hover:bg-black/10 text-black`
                       }
                       style={{ cursor: "pointer" }}
@@ -233,14 +232,14 @@ export default function BookSlotsClient() {
           <div className="mt-6 flex justify-between items-center">
             <p className="text-sm text-black/70">
               Selected <b>{selected.length}</b> • Total{" "}
-              <span className="text-[##E99E1B] font-semibold">
+              <span className="text-[#E99E1B] font-semibold">
                 ₹{court.price * selected.length}
               </span>
             </p>
             <button
               onClick={proceed}
               disabled={!selected.length}
-              className="bg-[##E99E1B] hover:bg-[#CF8A17] text-black px-6 py-3 rounded-lg disabled:opacity-50"
+              className="bg-[#E99E1B] hover:bg-[#CF8A17] text-black px-6 py-3 rounded-lg disabled:opacity-50"
             >
               Continue
             </button>

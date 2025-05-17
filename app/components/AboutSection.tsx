@@ -24,7 +24,7 @@ export default function AboutSection() {
     {
       icon: <Clock size={32} className="text-[#E99E1B]" />,
       title: "Extended Hours",
-      description: "Open 6 AM – 11 PM every day.",
+      description: "Open 4 PM – 11 PM every day.",
     },
     {
       icon: <Award size={32} className="text-[#E99E1B]" />,
@@ -250,20 +250,20 @@ export default function AboutSection() {
                   <span className="text-[#E99E1B] mr-3">•</span>
                   <div>
                     <span className="font-bold">Singles Court:</span>{" "}
-                    ₹1 200/hour
+                    ₹1400/hour
                   </div>
                 </li>
                 <li className="flex items-start">
                   <span className="text-[#E99E1B] mr-3">•</span>
                   <div>
                     <span className="font-bold">Doubles Court:</span>{" "}
-                    ₹1 600/hour
+                    ₹2000/hour
                   </div>
                 </li>
                 <li className="flex items-start">
                   <span className="text-[#E99E1B] mr-3">•</span>
                   <div>
-                    <span className="font-bold">Hours:</span> 6 AM – 11 PM
+                    <span className="font-bold">Hours:</span> 4 PM – 11 PM
                   </div>
                 </li>
               </ul>

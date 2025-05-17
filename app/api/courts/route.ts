@@ -6,14 +6,14 @@ const courts = [
     id: "court-1",
     name: "Singles Court",
     type: "Singles",
-    price: 1200,
+    price: 1400,
     image: "/paddle3.jpg",
   },
   {
     id: "court-2",
     name: "Doubles Court",
     type: "Doubles",
-    price: 1600,
+    price: 2000,
     image: "/paddle4.jpg",
   },
 ];

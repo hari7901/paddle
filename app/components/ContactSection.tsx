@@ -118,7 +118,7 @@ export default function ContactSection() {
                   {
                     icon: Clock,
                     label: "Business Hours",
-                    value: "Mon–Sun 6 AM–10 PM",
+                    value: "Mon–Sun 6 AM – 10 PM",
                   },
                 ].map(({ icon: Icon, label, value, link }) => (
                   <li key={label} className="group">
