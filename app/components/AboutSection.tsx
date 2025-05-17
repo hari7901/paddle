@@ -143,7 +143,7 @@ export default function AboutSection() {
           >
             <div className="relative h-64 md:h-80 lg:h-96 w-full rounded-xl overflow-hidden shadow-xl group">
               <img
-                src="/paddle3.jpg"
+                src="/image14.jpeg"
                 alt="ProPlay Sports Court"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />

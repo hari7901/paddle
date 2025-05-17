@@ -11,7 +11,7 @@ const courts = [
     name: "Singles Court",
     type: "Singles",
     price: 1400,
-    image: "/paddle3.jpg",
+    image: "/image6.jpeg",
     features: [
       "Professional-grade playing surface",
       "Perfect dimensions for 1v1 matches",
@@ -24,7 +24,7 @@ const courts = [
     name: "Doubles Court",
     type: "Doubles",
     price: 2000,
-    image: "/paddle4.jpg",
+    image: "/image3.jpeg",
     features: [
       "Regulation-size doubles court",
       "Spacious 2v2 play area",
